@@ -1,0 +1,51 @@
+---
+import { whatsappLink } from '../config/site';
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const d = t(Astro.props.lang);
+---
+
+<section class="section" id="offers">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <span class="eyebrow">{d.offers.eyebrow}</span>
+      <h2 data-split>{d.offers.title}</h2>
+    </header>
+    <div class="grid" data-stagger="110">
+      {
+        d.offers.items.map((o, i) => (
+          <article class:list={['card', 'offer', 'spot', o.featured && 'featured']} data-tilt="4">
+            {o.featured && <span class="badge">{d.offers.badge}</span>}
+            <span class="time">{o.time}</span>
+            <h3>{o.name}</h3>
+            <p>{o.body}</p>
+            {i === 0 && (
+              <a class="btn btn-primary btn-sm" href={whatsappLink(d.contact.waMessage)} target="_blank" rel="noopener">
+                {d.offers.cta}
+              </a>
+            )}
+          </article>
+        ))
+      }
+    </div>
+    <p class="note" data-reveal>{d.offers.note}</p>
+  </div>
+</section>
+
+<style>
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .offer { padding: 26px; display: grid; gap: 12px; align-content: start; position: relative; }
+  .offer:first-child { background: linear-gradient(160deg, var(--accent-soft), var(--surface) 60%); border-color: color-mix(in srgb, var(--accent) 35%, transparent); }
+  .featured { border-color: var(--amber); box-shadow: 0 0 0 4px var(--amber-soft); }
+  .badge { position: absolute; top: -12px; inset-inline-start: 22px; font-family: var(--font-mono); font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--amber); color: #1a1405; padding: 4px 10px; border-radius: 999px; }
+  :lang(ar) .badge { font-family: var(--font-ar); letter-spacing: 0; }
+  .time { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent); font-weight: 600; }
+  :lang(ar) .time { font-family: var(--font-ar); }
+  h3 { font-size: var(--step-1); }
+  p { color: var(--fg-2); font-size: 0.95rem; }
+  .btn { justify-self: start; margin-top: 6px; }
+  .note { margin-top: 24px; color: var(--fg-3); font-size: 0.95rem; }
+  @media (max-width: 1040px) { .grid { grid-template-columns: repeat(2, 1fr); gap: 22px 16px; } }
+  @media (max-width: 560px) { .grid { grid-template-columns: 1fr; } }
+</style>

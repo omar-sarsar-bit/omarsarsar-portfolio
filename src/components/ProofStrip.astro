@@ -1,0 +1,39 @@
+---
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const d = t(Astro.props.lang);
+---
+
+<section class="proof" aria-label={d.work.eyebrow}>
+  <div class="container">
+    <ul class="row" data-stagger="120">
+      {
+        d.proof.map((p) => (
+          <li>
+            <strong data-countup>{p.value}</strong>
+            <span>{p.label}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .proof { padding-block: 0 clamp(24px, 4vw, 48px); }
+  .row { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); border-block: 1px solid var(--line); }
+  li { display: grid; gap: 6px; padding: 26px 24px; border-inline-start: 1px solid var(--line); }
+  li:first-child { border-inline-start: 0; padding-inline-start: 0; }
+  strong { font-family: var(--font-display); font-size: var(--step-3); font-weight: 700; line-height: 1; letter-spacing: -0.02em; }
+  :lang(ar) strong { font-family: var(--font-ar); font-size: var(--step-2); }
+  span { color: var(--fg-2); font-size: 0.95rem; max-width: 26ch; }
+  @media (max-width: 860px) {
+    .row { grid-template-columns: repeat(2, 1fr); }
+    li:nth-child(3) { border-inline-start: 0; padding-inline-start: 0; }
+    li:nth-child(n + 3) { border-top: 1px solid var(--line); }
+  }
+  @media (max-width: 440px) {
+    li { padding: 20px 14px; }
+  }
+</style>

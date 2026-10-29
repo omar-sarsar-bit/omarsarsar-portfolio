@@ -1,0 +1,110 @@
+---
+import LogoMark from './LogoMark.astro';
+import { site } from '../config/site';
+import { t, localePath, otherLang, type Lang } from '../i18n';
+
+interface Props { lang: Lang; route?: string }
+const { lang, route } = Astro.props;
+const d = t(lang);
+const home = localePath(lang, '/');
+const anchor = (id: string) => (route === '/' ? `#${id}` : `${home}#${id}`);
+const switchHref = localePath(otherLang(lang), route ?? '/');
+const links = [
+  { id: 'services', label: d.nav.services },
+  { id: 'work', label: d.nav.work },
+  { id: 'process', label: d.nav.process },
+  { id: 'about', label: d.nav.about },
+  { id: 'faq', label: d.nav.faq },
+];
+---
+
+<header class="site-header" data-header>
+  <div class="container bar">
+    <a class="brand" href={home} aria-label={`${lang === 'ar' ? site.nameAr : site.name} · ${d.nav.home}`}>
+      <LogoMark size={34} />
+      <span class="brand-text">
+        <span class="brand-name">{lang === 'ar' ? site.nameAr : site.name}</span>
+        <span class="brand-role">{d.meta.role}</span>
+      </span>
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label={d.nav.menu} data-nav>
+      <ul>
+        {links.map((l) => <li><a href={anchor(l.id)}>{l.label}</a></li>)}
+      </ul>
+      <a class="btn btn-primary btn-sm nav-cta-mobile" href={anchor('contact')}>{d.nav.cta}</a>
+    </nav>
+
+    <div class="actions">
+      <a class="lang" href={switchHref} hreflang={otherLang(lang)} lang={otherLang(lang)} aria-label={d.nav.switchLabel}>{d.nav.switchTo}</a>
+      <button class="icon-btn" type="button" data-theme-toggle data-label-light={d.nav.themeToLight} data-label-dark={d.nav.themeToDark} aria-label={d.nav.themeToLight}>
+        <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"/></svg>
+        <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.6A8.2 8.2 0 0 1 9.4 4a8.2 8.2 0 1 0 10.6 10.6Z"/></svg>
+      </button>
+      <a class="btn btn-primary btn-sm cta" href={anchor('contact')}>{d.nav.cta}</a>
+      <button class="icon-btn menu-btn" type="button" aria-controls="site-nav" aria-expanded="false" data-menu data-label-open={d.nav.menu} data-label-close={d.nav.close} aria-label={d.nav.menu}>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path class="l1" d="M4 8h16"/><path class="l2" d="M4 16h16"/></svg>
+      </button>
+    </div>
+  </div>
+  <span class="progress" data-progress aria-hidden="true"></span>
+</header>
+
+<style>
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    padding-top: env(safe-area-inset-top, 0px);
+    background: color-mix(in srgb, var(--bg) 72%, transparent);
+    backdrop-filter: saturate(160%) blur(16px);
+    -webkit-backdrop-filter: saturate(160%) blur(16px);
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s, background-color 0.3s;
+  }
+  .site-header.is-scrolled { border-bottom-color: var(--line); background: color-mix(in srgb, var(--bg) 86%, transparent); }
+  .progress { position: absolute; inset-inline: 0; bottom: -1px; height: 2px; background: linear-gradient(90deg, var(--accent), var(--amber)); transform: scaleX(0); transform-origin: left; }
+  [dir='rtl'] .progress { transform-origin: right; }
+  .bar { display: flex; align-items: center; gap: 24px; min-height: 72px; }
+  .brand { display: flex; align-items: center; gap: 12px; text-decoration: none; flex: none; }
+  .brand-text { display: grid; line-height: 1.15; }
+  .brand-name { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; letter-spacing: -0.01em; }
+  :lang(ar) .brand-name { font-family: var(--font-ar); }
+  .brand-role { font-size: 0.74rem; color: var(--fg-3); }
+  .nav { margin-inline-start: auto; }
+  .nav ul { list-style: none; padding: 0; display: flex; gap: 4px; }
+  .nav a:not(.btn) { display: block; padding: 8px 12px; border-radius: 10px; text-decoration: none; color: var(--fg-2); font-size: 0.95rem; font-weight: 500; transition: color 0.2s, background-color 0.2s; }
+  .nav a:not(.btn):hover { color: var(--fg); background: var(--accent-soft); }
+  .nav-cta-mobile { display: none; }
+  .actions { display: flex; align-items: center; gap: 8px; }
+  .lang { padding: 8px 10px; border-radius: 10px; text-decoration: none; font-size: 0.92rem; font-weight: 600; color: var(--fg-2); }
+  .lang:lang(ar) { font-family: var(--font-ar); }
+  .lang:lang(en) { font-family: var(--font-body); }
+  .lang:hover { color: var(--fg); background: var(--accent-soft); }
+  .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 11px; border: 1px solid var(--line); background: transparent; cursor: pointer; color: var(--fg-2); transition: border-color 0.2s, color 0.2s; }
+  .icon-btn:hover { border-color: var(--line-strong); color: var(--fg); }
+  .icon-btn svg { width: 19px; height: 19px; }
+  .i-moon { display: none; }
+  :global([data-theme='light']) .i-sun { display: none; }
+  :global([data-theme='light']) .i-moon { display: block; }
+  .menu-btn { display: none; }
+  .menu-btn path { transition: transform 0.25s; transform-origin: center; }
+  .menu-btn[aria-expanded='true'] .l1 { transform: translateY(4px) rotate(45deg); }
+  .menu-btn[aria-expanded='true'] .l2 { transform: translateY(-4px) rotate(-45deg); }
+
+  @media (max-width: 1080px) {
+    .brand-role { display: none; }
+  }
+  @media (max-width: 920px) {
+    .menu-btn { display: grid; }
+    .cta { display: none; }
+    .nav {
+      position: absolute; inset-inline: 0; top: 100%;
+      background: var(--bg); border-bottom: 1px solid var(--line);
+      padding: 12px var(--gutter) 20px; display: none;
+    }
+    .nav.is-open { display: grid; gap: 12px; }
+    .nav ul { flex-direction: column; }
+    .nav a:not(.btn) { padding: 12px; font-size: 1.05rem; }
+    .nav-cta-mobile { display: inline-flex; }
+    .actions { margin-inline-start: auto; }
+  }
+</style>

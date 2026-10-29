@@ -1,0 +1,36 @@
+---
+import Base from '../layouts/Base.astro';
+import Hero from './Hero.astro';
+import ProofStrip from './ProofStrip.astro';
+import Marquee from './Marquee.astro';
+import Services from './Services.astro';
+import Work from './Work.astro';
+import AgentDemo from './AgentDemo.astro';
+import Process from './Process.astro';
+import Offers from './Offers.astro';
+import Why from './Why.astro';
+import About from './About.astro';
+import Faq from './Faq.astro';
+import Contact from './Contact.astro';
+import { personSchema, serviceSchema, faqSchema } from '../lib/schema';
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+---
+
+<Base lang={lang} title={d.meta.title} description={d.meta.description} route="/" jsonLd={[personSchema(lang), serviceSchema(lang), faqSchema(lang)]}>
+  <Hero lang={lang} />
+  <ProofStrip lang={lang} />
+  <Services lang={lang} />
+  <Marquee />
+  <Work lang={lang} />
+  <AgentDemo lang={lang} />
+  <Process lang={lang} />
+  <Offers lang={lang} />
+  <Why lang={lang} />
+  <About lang={lang} />
+  <Faq lang={lang} />
+  <Contact lang={lang} />
+</Base>

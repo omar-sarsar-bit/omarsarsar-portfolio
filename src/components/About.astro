@@ -1,0 +1,79 @@
+---
+import LogoMark from './LogoMark.astro';
+import { site } from '../config/site';
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+---
+
+<section class="section" id="about">
+  <div class="container">
+    <div class="card about" data-reveal>
+      <div class="portrait dot-grid" data-tilt="8">
+        <LogoMark size={160} class="mark" />
+        <p class="name">{lang === 'ar' ? site.nameAr : site.name}</p>
+        <p class="role">{d.meta.role}</p>
+      </div>
+      <div class="text">
+        <span class="eyebrow">{d.about.eyebrow}</span>
+        <h2 data-split>{d.about.title}</h2>
+        {d.about.body.map((p) => <p class="body">{p}</p>)}
+        <dl class="facts" data-stagger="90">
+          {
+            d.about.facts.map((f) => (
+              <div>
+                <dt>{f.k}</dt>
+                <dd>{f.v}</dd>
+              </div>
+            ))
+          }
+        </dl>
+        <div class="links">
+          <a class="link" href={site.orpetron} target="_blank" rel="noopener">
+            <span>{d.about.orpetron}</span>
+            <span class="meta mono ltr">orpetron.agency</span>
+            <svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+          <a class="link" href={site.iconscout} target="_blank" rel="noopener">
+            <span>{d.about.iconscout}</span>
+            <span class="meta mono">{d.about.iconscoutMeta}</span>
+            <svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8"/></svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .about { display: grid; grid-template-columns: 0.8fr 1.2fr; overflow: hidden; }
+  .portrait {
+    display: grid; place-content: center; justify-items: center; gap: 10px; padding: 48px 24px;
+    background-color: var(--bg-raised); border-inline-end: 1px solid var(--line); text-align: center;
+    transform-style: preserve-3d;
+  }
+  .portrait :global(.mark) { width: clamp(120px, 14vw, 180px); height: auto; border-radius: 28%; box-shadow: 0 30px 60px -30px var(--glow); margin-bottom: 14px; }
+  .name { font-family: var(--font-display); font-weight: 700; font-size: var(--step-2); }
+  :lang(ar) .name { font-family: var(--font-ar); }
+  .role { color: var(--fg-3); font-size: 0.92rem; }
+  .text { padding: clamp(28px, 4vw, 56px); display: grid; gap: 18px; align-content: start; }
+  h2 { font-size: var(--step-3); }
+  .body { color: var(--fg-2); }
+  .facts { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 16px; overflow: hidden; margin-top: 8px; }
+  .facts div { background: var(--surface); padding: 14px 16px; }
+  dt { font-size: 0.8rem; color: var(--fg-3); }
+  dd { margin: 0; font-weight: 600; }
+  .links { display: grid; gap: 10px; margin-top: 6px; }
+  .link { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 14px; text-decoration: none; transition: border-color 0.2s, background-color 0.2s; }
+  .link:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .link span:first-child { font-weight: 600; }
+  .meta { color: var(--fg-3); font-size: 0.8rem; margin-inline-start: auto; }
+  .link svg { width: 18px; height: 18px; color: var(--fg-3); flex: none; }
+  @media (max-width: 860px) {
+    .about { grid-template-columns: 1fr; }
+    .portrait { border-inline-end: 0; border-bottom: 1px solid var(--line); }
+  }
+  @media (max-width: 460px) { .facts { grid-template-columns: 1fr; } }
+</style>

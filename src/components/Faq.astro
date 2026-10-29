@@ -1,0 +1,54 @@
+---
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const d = t(Astro.props.lang);
+---
+
+<section class="section" id="faq">
+  <div class="container grid">
+    <header class="head" data-reveal>
+      <span class="eyebrow">{d.faq.eyebrow}</span>
+      <h2 data-split>{d.faq.title}</h2>
+    </header>
+    <div class="list" data-reveal>
+      {
+        d.faq.items.map((f, i) => (
+          <details name="faq" open={i === 0}>
+            <summary>
+              <span>{f.q}</span>
+              <i aria-hidden="true" />
+            </summary>
+            <div class="answer">
+              <p>{f.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .grid { display: grid; grid-template-columns: 0.8fr 1.2fr; gap: clamp(32px, 6vw, 96px); align-items: start; }
+  .head { display: grid; gap: 18px; position: sticky; top: 110px; }
+  h2 { font-size: var(--step-3); }
+  .list { border-top: 1px solid var(--line); }
+  details { border-bottom: 1px solid var(--line); }
+  summary { list-style: none; cursor: pointer; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 22px 0; font-weight: 600; font-size: var(--step-1); }
+  summary::-webkit-details-marker { display: none; }
+  summary:hover { color: var(--accent); }
+  summary i { width: 28px; height: 28px; flex: none; position: relative; border-radius: 50%; border: 1px solid var(--line-strong); transition: transform 0.3s, background-color 0.3s; }
+  summary i::before, summary i::after { content: ''; position: absolute; inset: 50% auto auto 50%; width: 11px; height: 1.6px; background: currentColor; transform: translate(-50%, -50%); }
+  summary i::after { transform: translate(-50%, -50%) rotate(90deg); transition: transform 0.3s; }
+  details[open] summary i { background: var(--accent-soft); border-color: var(--accent); }
+  details[open] summary i::after { transform: translate(-50%, -50%) rotate(0deg); }
+  .answer p { color: var(--fg-2); padding-bottom: 22px; max-width: 64ch; }
+  details::details-content { block-size: 0; overflow: hidden; transition: block-size 0.35s cubic-bezier(0.2, 0.7, 0.2, 1), content-visibility 0.35s allow-discrete; }
+  details[open]::details-content { block-size: auto; }
+  .list { interpolate-size: allow-keywords; }
+  @media (max-width: 860px) {
+    .grid { grid-template-columns: 1fr; }
+    .head { position: static; }
+  }
+</style>

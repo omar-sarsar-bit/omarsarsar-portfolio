@@ -1,0 +1,50 @@
+---
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const d = t(Astro.props.lang);
+---
+
+<section class="section" id="process">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <span class="eyebrow">{d.process.eyebrow}</span>
+      <h2 data-split>{d.process.title}</h2>
+    </header>
+    <ol class="steps" data-scroll-line data-stagger="140">
+      {
+        d.process.steps.map((s, i) => (
+          <li>
+            <div class="marker">
+              <span class="n mono">{String(i + 1).padStart(2, '0')}</span>
+            </div>
+            <span class="time">{s.time}</span>
+            <h3>{s.title}</h3>
+            <p>{s.body}</p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .steps { list-style: none; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; position: relative; }
+  .steps::before { content: ''; position: absolute; top: 24px; inset-inline: 24px; height: 2px; background: repeating-linear-gradient(90deg, var(--line-strong) 0 8px, transparent 8px 14px); }
+  .steps::after { content: ''; position: absolute; top: 24px; inset-inline-start: 24px; width: calc(100% - 48px); height: 2px; background: linear-gradient(90deg, var(--accent), var(--amber)); transform: scaleX(var(--p, 0)); transform-origin: left; }
+  [dir='rtl'] .steps::after { transform-origin: right; background: linear-gradient(-90deg, var(--accent), var(--amber)); }
+  li { display: grid; gap: 12px; align-content: start; position: relative; }
+  .marker { display: flex; align-items: center; }
+  .n { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 14px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--accent); font-weight: 700; position: relative; z-index: 1; }
+  .n { transition: background-color 0.4s, color 0.4s, border-color 0.4s, box-shadow 0.4s; }
+  li:first-child .n, li.is-active .n { background: var(--accent-fill); color: var(--on-accent); border-color: var(--accent-fill); box-shadow: 0 0 0 6px var(--accent-soft); }
+  .time { justify-self: start; font-family: var(--font-mono); font-size: 0.76rem; font-weight: 600; color: var(--amber); background: var(--amber-soft); padding: 3px 9px; border-radius: 999px; margin-top: 6px; }
+  :lang(ar) .time { font-family: var(--font-ar); }
+  h3 { font-size: var(--step-1); }
+  p { color: var(--fg-2); font-size: 0.97rem; }
+  @media (max-width: 900px) {
+    .steps { grid-template-columns: 1fr 1fr; gap: 36px 24px; }
+    .steps::before, .steps::after { display: none; }
+  }
+  @media (max-width: 520px) { .steps { grid-template-columns: 1fr; } }
+</style>

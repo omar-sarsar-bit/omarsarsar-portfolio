@@ -1,0 +1,72 @@
+---
+import { t, localePath, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+---
+
+<section class="section" id="work">
+  <div class="container">
+    <header class="section-head" data-reveal>
+      <span class="eyebrow">{d.work.eyebrow}</span>
+    </header>
+    <article class="card feature spot">
+      <div class="text">
+        <h2 data-split>{d.work.title}</h2>
+        <p class="lede">{d.work.lede}</p>
+        <p class="stack"><span class="mono">{d.work.stackLabel}</span><span class="ltr">{d.work.stack}</span></p>
+        <a class="btn btn-primary" href={localePath(lang, '/work/multilingual-ai-intake/')}>
+          {d.work.cta}
+          <svg class="flip" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="diagram dot-grid" aria-hidden="true">
+        <ol class="layers" data-stagger="160" data-reveal>
+          {
+            d.work.layers.map((l) => (
+              <li>
+                <span class="n mono">{l.n}</span>
+                <span class="lt">
+                  <strong>{l.title}</strong>
+                  <span>{l.body}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ol>
+        <div class="mini-grid" data-stagger="22">
+          {Array.from({ length: 43 }, (_, i) => <span class:list={[[3, 9, 16, 22, 30, 37].includes(i) && 'on']} />)}
+        </div>
+      </div>
+    </article>
+  </div>
+</section>
+
+<style>
+  .section-head { margin-bottom: 24px; }
+  .feature { display: grid; grid-template-columns: 1.1fr 1fr; overflow: hidden; }
+  .text { padding: clamp(28px, 4vw, 56px); display: grid; gap: 22px; align-content: center; justify-items: start; }
+  h2 { font-size: var(--step-3); }
+  .lede { color: var(--fg-2); font-size: var(--step-1); }
+  .stack { display: flex; flex-wrap: wrap; gap: 6px 14px; font-size: 0.92rem; color: var(--fg-2); }
+  .stack .mono { color: var(--fg-3); text-transform: uppercase; letter-spacing: 0.08em; font-size: 0.78rem; padding-top: 2px; }
+  :lang(ar) .stack .mono { font-family: var(--font-ar); text-transform: none; letter-spacing: 0; font-size: 0.85rem; }
+  .diagram { background-color: var(--bg-raised); border-inline-start: 1px solid var(--line); padding: clamp(28px, 4vw, 48px); display: grid; gap: 28px; align-content: center; }
+  .layers { list-style: none; padding: 0; display: grid; gap: 22px; position: relative; }
+  .layers::before { content: ''; position: absolute; inset-inline-start: 23px; top: 24px; bottom: 24px; width: 2px; background: linear-gradient(var(--accent), var(--amber)); opacity: 0.6; transform-origin: top; transition: transform 1.2s var(--ease-in-out) 0.2s; }
+  :global(.js) .layers:not(.is-in)::before { transform: scaleY(0); }
+  .layers li { display: flex; align-items: center; gap: 16px; position: relative; }
+  .n { width: 48px; height: 48px; flex: none; display: grid; place-items: center; border-radius: 14px; background: var(--surface); border: 1px solid var(--line-strong); color: var(--accent); font-weight: 700; font-size: 0.9rem; }
+  .layers li:nth-child(2) .n { border-color: var(--amber); color: var(--amber); }
+  .lt { display: grid; gap: 2px; padding: 12px 16px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); flex: 1; min-width: 0; }
+  .lt strong { font-size: 1rem; }
+  .lt span { color: var(--fg-2); font-size: 0.9rem; }
+  .mini-grid { display: grid; grid-template-columns: repeat(15, 1fr); gap: 6px; padding-inline-start: 64px; }
+  .mini-grid span { aspect-ratio: 1; border-radius: 4px; background: var(--mint-soft); border: 1px solid color-mix(in srgb, var(--mint) 40%, transparent); }
+  .mini-grid span.on { background: var(--mint); }
+  @media (max-width: 900px) {
+    .feature { grid-template-columns: 1fr; }
+    .diagram { border-inline-start: 0; border-top: 1px solid var(--line); }
+  }
+</style>

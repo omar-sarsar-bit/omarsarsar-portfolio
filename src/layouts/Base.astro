@@ -1,0 +1,93 @@
+---
+import '@fontsource-variable/bricolage-grotesque/opsz.css';
+import '@fontsource-variable/instrument-sans';
+import '@fontsource-variable/readex-pro';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import bricolageLatin from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-opsz-normal.woff2?url';
+import readexArabic from '@fontsource-variable/readex-pro/files/readex-pro-arabic-wght-normal.woff2?url';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../config/site';
+import { THEME_INIT } from '../scripts/theme-init.mjs';
+import { t, localePath, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  description: string;
+  /** Route without locale prefix, e.g. "/" or "/work/x/". Omit for pages with no language twin (404). */
+  route?: string;
+  ogType?: 'website' | 'article';
+  jsonLd?: Record<string, unknown>[];
+  noindex?: boolean;
+}
+
+const { lang, title, description, route, ogType = 'website', jsonLd = [], noindex = false } = Astro.props;
+const d = t(lang);
+const abs = (path: string) => new URL(path, site.url).href;
+const canonical = route ? abs(localePath(lang, route)) : undefined;
+const ogImage = abs(`/og/${lang}.png`);
+---
+
+<!doctype html>
+<html lang={lang} dir={d.meta.dir}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {canonical && <link rel="canonical" href={canonical} />}
+    {
+      route && (
+        <>
+          <link rel="alternate" hreflang="en" href={abs(localePath('en', route))} />
+          <link rel="alternate" hreflang="ar" href={abs(localePath('ar', route))} />
+          <link rel="alternate" hreflang="x-default" href={abs(localePath('en', route))} />
+        </>
+      )
+    }
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    {canonical && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={d.meta.ogLocale} />
+    <meta property="og:locale:alternate" content={lang === 'en' ? 'ar_AR' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <meta name="theme-color" content="#0A0D1C" />
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    {lang === 'en' && <link rel="preload" href={bricolageLatin} as="font" type="font/woff2" crossorigin />}
+    {lang === 'ar' && <link rel="preload" href={readexArabic} as="font" type="font/woff2" crossorigin />}
+
+    <script is:inline set:html={THEME_INIT} />
+
+    {jsonLd.map((item) => <script type="application/ld+json" set:html={JSON.stringify(item)} />)}
+  </head>
+  <body>
+    <a class="skip" href="#main">{d.nav.skip}</a>
+    <Header lang={lang} route={route} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} route={route} />
+    <script>
+      import '../scripts/site';
+    </script>
+  </body>
+</html>
