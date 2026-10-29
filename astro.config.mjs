@@ -1,9 +1,9 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import { createHash } from 'node:crypto';
-import { THEME_INIT } from './src/scripts/theme-init.mjs';
+import { BOOT } from './src/scripts/boot.mjs';
 
-const themeHash = `sha256-${createHash('sha256').update(THEME_INIT).digest('base64')}`;
+const bootHash = `sha256-${createHash('sha256').update(BOOT).digest('base64')}`;
 
 export const SITE_URL = 'https://omarsarsar.vercel.app';
 
@@ -14,7 +14,7 @@ export default defineConfig({
   // Inline the CSS so the first paint does not wait on a stylesheet request.
   build: { inlineStylesheets: 'always' },
   // Keep every asset as a file so fonts load under the strict font-src 'self' policy.
-  vite: { build: { assetsInlineLimit: 0 } },
+  vite: { build: { assetsInlineLimit: 0, chunkSizeWarningLimit: 700 } },
   i18n: {
     locales: ['en', 'ar'],
     defaultLocale: 'en',
@@ -37,7 +37,7 @@ export default defineConfig({
         "form-action 'self'",
         "object-src 'none'",
       ],
-      scriptDirective: { hashes: [themeHash] },
+      scriptDirective: { hashes: [bootHash] },
       // Components position elements with inline style attributes, which hashes cannot cover.
       styleDirective: { resources: ["'self'", "'unsafe-inline'"] },
     },

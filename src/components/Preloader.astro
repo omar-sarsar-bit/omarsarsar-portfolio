@@ -1,0 +1,32 @@
+---
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const d = t(Astro.props.lang);
+---
+
+<div class="pre" data-pre aria-hidden="true">
+  <div class="pre-log mono">
+    <p class="ltr">{d.ui.loading}…</p>
+    <ol class="ltr">
+      {d.ui.loadingSteps.map((s) => <li data-pre-step><span class="ok">✓</span> {s}</li>)}
+    </ol>
+  </div>
+  <p class="pre-count display ltr" data-pre-count>000</p>
+  <span class="pre-bar" data-pre-bar></span>
+</div>
+
+<style>
+  .pre {
+    position: fixed; inset: 0; z-index: 250;
+    background: var(--ink); color: var(--paper);
+    display: grid; grid-template-rows: 1fr auto; padding: var(--pad);
+  }
+  :global(.no-preload) .pre, :global(html:not(.js)) .pre { display: none; }
+  .pre-log { align-self: start; display: grid; gap: 10px; color: color-mix(in srgb, var(--paper) 70%, transparent); }
+  .pre-log ol { display: grid; gap: 4px; }
+  .pre-log li { opacity: 0; }
+  .ok { color: var(--amber); }
+  .pre-count { font-size: clamp(6rem, 26vw, 24rem); line-height: 0.8; font-stretch: 150%; font-weight: 800; }
+  .pre-bar { position: absolute; inset-inline: 0; bottom: 0; height: 2px; background: var(--amber); transform: scaleX(0); transform-origin: left; }
+</style>

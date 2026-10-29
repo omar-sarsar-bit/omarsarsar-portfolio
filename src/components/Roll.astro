@@ -1,0 +1,7 @@
+---
+// Text that rolls on hover: the label slides up and an identical copy rolls in from below.
+interface Props { text: string }
+const { text } = Astro.props;
+---
+
+<span class="roll"><span>{text}</span><span aria-hidden="true">{text}</span></span>

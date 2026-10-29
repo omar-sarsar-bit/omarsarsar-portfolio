@@ -1,7 +1,7 @@
 // Contact details and links used across the site. Edit this file to update them everywhere.
 export const site = {
   name: 'Omar Sarsar',
-  nameAr: 'عمر سرسار',
+  nameAr: 'عمر صرصر',
   url: 'https://omarsarsar.vercel.app',
   email: 'omarsarsar.orpetron@gmail.com',
   // International format, digits only after the plus sign.

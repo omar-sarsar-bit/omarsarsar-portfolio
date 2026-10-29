@@ -1,0 +1,78 @@
+---
+// A conversation shown as a transcript: timestamps, speaker, the prompt rules applied, then the routing.
+import { t, type Lang } from '../i18n';
+import { demoScripts, type DemoLang } from '../i18n/demo-scripts';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const initial: DemoLang = lang;
+const script = demoScripts[initial];
+const order: DemoLang[] = lang === 'ar' ? ['ar', 'en', 'fr'] : ['en', 'ar', 'fr'];
+const stamp = (i: number) => `02:00:${String(14 + i * 3).padStart(2, '0')}`;
+const labels = { user: d.demo.user, agent: d.demo.agent, routed: d.demo.routed, voice: script.voiceLabel };
+---
+
+<div class="chat" data-chat data-initial={initial} data-labels={JSON.stringify(labels)}>
+  <div class="chat-head mono">
+    <span>{d.demo.title}</span>
+    <div class="chat-langs" role="group" aria-label={d.demo.langLabel}>
+      {
+        order.map((k) => (
+          <button type="button" data-lang={k} aria-pressed={k === initial ? 'true' : 'false'} lang={k}>
+            {k.toUpperCase()}
+          </button>
+        ))
+      }
+    </div>
+    <button type="button" class="replay" data-replay>↻ {d.demo.replay}</button>
+  </div>
+  <ol class="chat-lines" data-thread dir={script.dir} lang={initial} aria-live="polite">
+    {
+      script.messages.map((m, i) => (
+        <li class:list={['line', m.from]}>
+          <span class="who mono">
+            <span class="ltr">{stamp(i)}</span>
+            <span>{m.from === 'user' ? d.demo.user : d.demo.agent}</span>
+            {m.voice && <span class="voice">{script.voiceLabel}</span>}
+            {m.rules && <span class="rules-tag ltr">{m.rules.map((r) => `R${r + 1}`).join(' ')}</span>}
+          </span>
+          <p>{m.text}</p>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="chat-route mono" data-route><span class="key"></span> {script.route}</p>
+  <p class="chat-note mono">{d.demo.note}</p>
+  <script type="application/json" data-scripts set:html={JSON.stringify(demoScripts)} />
+</div>
+
+<style>
+  .chat { border-top: 1px solid var(--rule-strong); }
+  .chat-head { display: flex; align-items: center; gap: 18px; padding: 12px 0; border-bottom: 1px solid var(--rule); color: var(--muted); }
+  .chat-langs { display: flex; gap: 2px; margin-inline-start: auto; }
+  .chat-langs button { padding: 4px 8px; font: inherit; color: var(--muted); border-bottom: 1px solid transparent; }
+  .chat-langs button[aria-pressed='true'] { color: var(--fg); border-bottom-color: var(--accent); }
+  .replay { font: inherit; color: var(--muted); padding: 4px 0; }
+  .replay:hover, .chat-langs button:hover { color: var(--fg); }
+  .chat-lines { display: grid; }
+  .chat-lines[lang='ar'] { font-family: var(--arabic); }
+  .chat-lines[lang='en'], .chat-lines[lang='fr'] { font-family: var(--text); }
+  .chat-lines :global(.line) { display: grid; grid-template-columns: minmax(8.5rem, 0.32fr) 1fr; gap: var(--gap); padding: 12px 0; border-bottom: 1px solid var(--rule); }
+  .chat-lines :global(.who) { display: flex; flex-direction: column; gap: 2px; color: var(--muted); }
+  .chat-lines :global(.agent .who span:nth-child(2)) { color: var(--accent); }
+  .chat-lines :global(.rules-tag) { color: var(--fg); }
+  .chat-lines :global(p) { font-size: 1.02em; line-height: 1.45; }
+  .chat-lines :global(.user p) { font-weight: 500; }
+  .chat-lines :global(.typing) { display: inline-flex; gap: 4px; padding-top: 8px; }
+  .chat-lines :global(.typing i) { width: 5px; height: 5px; background: currentColor; animation: blink 1s infinite; }
+  .chat-lines :global(.typing i:nth-child(2)) { animation-delay: 0.15s; }
+  .chat-lines :global(.typing i:nth-child(3)) { animation-delay: 0.3s; }
+  @keyframes blink { 50% { opacity: 0.2; } }
+  .chat-route { display: flex; align-items: center; gap: 10px; padding: 14px 0 6px; color: var(--fg); }
+  .chat-note { color: var(--muted); }
+  @media (max-width: 560px) {
+    .chat-lines :global(.line) { grid-template-columns: 1fr; gap: 4px; }
+    .chat-lines :global(.who) { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+  }
+</style>

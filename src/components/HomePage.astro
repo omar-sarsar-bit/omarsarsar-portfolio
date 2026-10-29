@@ -1,36 +1,420 @@
 ---
 import Base from '../layouts/Base.astro';
-import Hero from './Hero.astro';
-import ProofStrip from './ProofStrip.astro';
-import Marquee from './Marquee.astro';
-import Services from './Services.astro';
-import Work from './Work.astro';
-import AgentDemo from './AgentDemo.astro';
-import Process from './Process.astro';
-import Offers from './Offers.astro';
-import Why from './Why.astro';
-import About from './About.astro';
-import Faq from './Faq.astro';
-import Contact from './Contact.astro';
+import Chapter from './Chapter.astro';
+import AgentChat from './AgentChat.astro';
+import Roll from './Roll.astro';
+import { site, whatsappLink, emailLink } from '../config/site';
 import { personSchema, serviceSchema, faqSchema } from '../lib/schema';
-import { t, type Lang } from '../i18n';
+import { t, localePath, otherLang, type Lang } from '../i18n';
 
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
+const caseHref = localePath(lang, '/work/multilingual-ai-intake/');
+const name = lang === 'ar' ? site.nameAr : site.name;
+const pad = (n: number) => String(n).padStart(2, '0');
 ---
 
-<Base lang={lang} title={d.meta.title} description={d.meta.description} route="/" jsonLd={[personSchema(lang), serviceSchema(lang), faqSchema(lang)]}>
-  <Hero lang={lang} />
-  <ProofStrip lang={lang} />
-  <Services lang={lang} />
-  <Marquee />
-  <Work lang={lang} />
-  <AgentDemo lang={lang} />
-  <Process lang={lang} />
-  <Offers lang={lang} />
-  <Why lang={lang} />
-  <About lang={lang} />
-  <Faq lang={lang} />
-  <Contact lang={lang} />
+<Base lang={lang} title={d.meta.title} description={d.meta.description} route="/" ascent jsonLd={[personSchema(lang), serviceSchema(lang), faqSchema(lang)]}>
+  <canvas slot="backdrop" class="scene" data-scene aria-hidden="true"></canvas>
+
+  <!-- 00 · Start -->
+  <section class="ch ch-start" id="start" data-ch="0" data-tone="paper" aria-labelledby="start-h" data-cursor-zone={d.ui.clickHint}>
+    <div class="anchor a0" data-anchor="0" aria-hidden="true"></div>
+    <div class="start-top grid">
+      <p class="start-story" data-fade>{d.hero.story}</p>
+    </div>
+    <p class="start-cue mono" aria-hidden="true"><span class="cue-arrow">↑</span><span>{d.ui.cue}</span><span class="cue-hint">{d.ui.clickHint}</span></p>
+    <h1 id="start-h" class="start-title display" data-title>
+      {d.hero.title.map((l) => <span class="line">{l}</span>)}
+    </h1>
+    <div class="start-actions grid">
+      <a class="act" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}>
+        <Roll text={d.hero.primary} /><span class="arr" aria-hidden="true">↑</span>
+      </a>
+      <a class="ul" href={caseHref} data-cursor-text={d.ui.cursorOpen}>{d.hero.secondary}</a>
+      <p class="start-id mono">{name} · {d.meta.role}</p>
+    </div>
+  </section>
+
+  <!-- 01 · Understand -->
+  <Chapter lang={lang} id="understand" index={1} tone="paper" node={d.understand.node} service={d.understand.service}>
+    <div class="title-row grid"><h2 id="understand-h" class="ch-title display" data-title>{d.understand.title.map((l) => <span class="line">{l}</span>)}</h2><div class="anchor" data-anchor="1" aria-hidden="true"></div></div>
+    <div class="u-grid grid">
+      <div class="u-text">
+        <p class="lead" data-fade>{d.understand.body}</p>
+        <div class="rules-wrap">
+          <p class="mono label">{d.demo.rulesTitle}</p>
+          <ol class="rules rows" data-rules>
+            {
+              d.demo.rules.map((r, i) => (
+                <li data-rule={i}>
+                  <span class="mono ltr">R{i + 1}</span>
+                  <span class="rt">{r.title}</span>
+                  <span class="rb">{r.body}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
+      <div class="u-chat"><AgentChat lang={lang} /></div>
+    </div>
+  </Chapter>
+
+  <!-- 02 · Route -->
+  <Chapter lang={lang} id="route" index={2} tone="cobalt" node={d.route.node} service={d.route.service}>
+    <h2 id="route-h" class="ch-title display" data-title>{d.route.title.map((l) => <span class="line">{l}</span>)}</h2>
+    <div class="r-grid grid">
+      <div class="r-text">
+        <p class="lead" data-fade>{d.route.body}</p>
+        <ul class="rows points">
+          {d.route.points.map((p, i) => <li><span class="mono ltr">{String.fromCharCode(97 + i)}</span>{p}</li>)}
+        </ul>
+        <a class="act" href={caseHref} data-cursor-text={d.ui.cursorOpen}><Roll text={d.route.caseLink} /><span class="arr" aria-hidden="true">↗</span></a>
+      </div>
+      <div class="r-big">
+        <p class="r-num display ltr" data-stretch>{d.route.number}</p>
+        <p class="mono r-cap">{d.route.numberCaption}</p>
+        <div class="anchor a2" data-anchor="2" aria-hidden="true"><div class="r-tiles" data-tiles>{Array.from({ length: 43 }, () => <i />)}</div></div>
+      </div>
+    </div>
+  </Chapter>
+
+  <!-- 03 · Report -->
+  <Chapter lang={lang} id="report" index={3} tone="ink" node={d.report.node} service={d.report.service}>
+    <h2 id="report-h" class="ch-title display" data-title>{d.report.title.map((l) => <span class="line">{l}</span>)}</h2>
+    <div class="rep-grid grid">
+      <p class="lead" data-fade>{d.report.body}</p>
+      <div class="anchor a3" data-anchor="3" aria-hidden="true"></div>
+      <ol class="rep-rows rows">
+        {
+          d.report.rows.map((r, i) => (
+            <li>
+              <span class="rk display">{r.k}</span>
+              <span class="rv">{r.v}</span>
+              <span class="rbar" aria-hidden="true"><i data-bar={i} /></span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </Chapter>
+
+  <!-- 04 · Interface -->
+  <Chapter lang={lang} id="interface" index={4} tone="paper" node={d.interface.node} service={d.interface.service}>
+    <h2 id="interface-h" class="ch-title display" data-title>{d.interface.title.map((l) => <span class="line">{l}</span>)}</h2>
+    <div class="grid">
+      <p class="lead i-lead" data-fade>{d.interface.body}</p>
+      <div class="anchor a4" data-anchor="4" aria-hidden="true"></div>
+    </div>
+    <div class="i-process">
+      <p class="mono label pad">{d.interface.processTitle}</p>
+      <ol class="steps grid" data-steps>
+        {
+          d.interface.steps.map((s, i) => (
+            <li>
+              <span class="mono ltr">{pad(i + 1)}</span>
+              <span class="st display">{s.title}</span>
+              <span class="mono sm">{s.time}</span>
+              <span class="sb">{s.body}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+    <div class="i-offers">
+      <p class="mono label pad">{d.interface.offersTitle}</p>
+      <ol class="offers">
+        {
+          d.interface.offers.map((o, i) => (
+            <li>
+              <a class="offer grid" href={whatsappLink(d.interface.offerMessage + o.name)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}>
+                <span class="mono ltr">{pad(i + 1)}</span>
+                <span class="on display">{o.name}</span>
+                <span class="mono ot">{o.time}</span>
+                <span class="ob">{o.body}</span>
+                <span class="oa" aria-hidden="true">↗</span>
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="mono note pad">{d.interface.offersNote}</p>
+    </div>
+  </Chapter>
+
+  <!-- 05 · Human -->
+  <Chapter lang={lang} id="human" index={5} tone="ink" node={d.human.node}>
+    <div class="title-row grid"><h2 id="human-h" class="ch-title display" data-title>{d.human.title.map((l) => <span class="line">{l}</span>)}</h2><div class="anchor" data-anchor="5" aria-hidden="true"></div></div>
+    <div class="grid">
+      <p class="h-story" data-lit>{d.human.story}</p>
+    </div>
+    <div class="h-grid grid">
+      <dl class="h-facts rows">
+        {
+          d.human.facts.map((f) => (
+            <div>
+              <dt class="mono">{f.k}</dt>
+              <dd>{f.v}</dd>
+            </div>
+          ))
+        }
+      </dl>
+      <div class="h-links">
+        <a class="act" href={site.orpetron} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorOpen}><Roll text={d.human.orpetron} /><span class="arr" aria-hidden="true">↗</span></a>
+        <a class="act" href={site.iconscout} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorOpen}><Roll text={d.human.iconscout} /><span class="arr" aria-hidden="true">↗</span></a>
+      </div>
+    </div>
+  </Chapter>
+
+  <!-- 06 · Output -->
+  <Chapter lang={lang} id="output" index={6} tone="cobalt" node={d.output.node} class="ch-output">
+    <div class="faq">
+      <h3 class="mono label pad">{d.output.faqTitle}</h3>
+      <div class="faq-list">
+        {
+          d.output.faq.map((f, i) => (
+            <details name="faq">
+              <summary class="grid">
+                <span class="mono ltr">{pad(i + 1)}</span>
+                <span class="fq">{f.q}</span>
+                <span class="fx mono" aria-hidden="true" />
+              </summary>
+              <div class="grid"><p class="fa">{f.a}</p></div>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+
+    <div class="contact grid">
+      <h2 id="output-h" class="ch-title display contact-title" data-title>{d.output.title.map((l) => <span class="line">{l}</span>)}</h2>
+      <div class="contact-text">
+        <p class="lead" data-fade>{d.output.body}</p>
+        <p class="mono avail"><span class="key"></span> {d.output.availability}</p>
+        <ul class="contact-links rows">
+          <li>
+            <span class="mono">{d.output.whatsapp}</span>
+            <a class="ul ltr" id="c-phone" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener">{site.whatsapp}</a>
+            <button type="button" class="mono cp" data-copy={site.whatsapp} data-copied={d.ui.copied} aria-describedby="c-phone" data-cursor-text={d.ui.cursorCopy}>{d.ui.copy}</button>
+          </li>
+          <li>
+            <span class="mono">{d.output.email}</span>
+            <a class="ul ltr" id="c-mail" href={emailLink(d.output.emailSubject)}>{site.email}</a>
+            <button type="button" class="mono cp" data-copy={site.email} data-copied={d.ui.copied} aria-describedby="c-mail" data-cursor-text={d.ui.cursorCopy}>{d.ui.copy}</button>
+          </li>
+          {
+            site.linkedin && (
+              <li>
+                <span class="mono">{d.output.linkedin}</span>
+                <a class="ul" href={site.linkedin} target="_blank" rel="noopener">linkedin.com</a>
+                <span />
+              </li>
+            )
+          }
+        </ul>
+      </div>
+      <a class="circle" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener" data-magnetic data-anchor="6" data-cursor-text={d.ui.cursorSend}>
+        <span class="circle-in"><Roll text={d.output.circle} /><span aria-hidden="true">↑</span></span>
+      </a>
+    </div>
+
+    <div class="marquee" aria-hidden="true" data-marquee>
+      <div class="marquee-track display" data-marquee-track>
+        {Array.from({ length: 4 }, () => <span>{d.output.marquee} <i class="key" /></span>)}
+      </div>
+    </div>
+
+    <footer class="outro">
+      <div class="outro-meta grid mono">
+        <span>{d.ui.localTime} · UTC+3 · <span class="ltr" data-clock>--:--</span></span>
+        <a href="#start" class="ul" data-goto="start">{d.ui.backToStart} ↓</a>
+        <a class="ul" href={localePath(otherLang(lang), '/')} hreflang={otherLang(lang)} lang={otherLang(lang)}>{d.ui.switchTo}</a>
+        <span>© {new Date().getFullYear()} {name}. {d.ui.rights}</span>
+      </div>
+      <p class="outro-name display" aria-hidden="true" data-fit>{name}</p>
+    </footer>
+  </Chapter>
+
+  <script>
+    import '../scripts/ascent';
+  </script>
 </Base>
+
+<style>
+  /* Scene behind the world */
+  .scene { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 1.2s var(--ease); }
+  :global(.scene-on) .scene { opacity: 1; }
+  :global(main) { position: relative; z-index: 1; }
+
+  .pad { padding-inline: var(--pad); }
+  .label { color: var(--muted); margin-bottom: 12px; }
+  .lead { font-size: clamp(1.05rem, 0.6vw + 0.9rem, 1.45rem); line-height: 1.42; max-width: 34ch; }
+  .ch-title { font-size: clamp(2.8rem, 7.2vw, 9rem); padding-inline: var(--pad); }
+  .title-row { align-items: stretch; }
+  .title-row .ch-title { grid-column: 1 / span 8; padding-inline: 0; }
+  .title-row .anchor { grid-column: 9 / span 4; min-height: 12rem; }
+  :lang(ar) .ch-title { font-size: clamp(2.4rem, 6.6vw, 7.5rem); }
+
+  /* 00 · Start */
+  .ch-start {
+    position: relative; min-height: 100svh; display: grid;
+    grid-template-rows: auto 1fr auto auto;
+    padding: calc(64px + env(safe-area-inset-top, 0px)) 0 calc(var(--dock) + 28px);
+    gap: clamp(16px, 3vh, 32px);
+  }
+  .start-top { align-items: start; }
+  .anchor { pointer-events: none; }
+  .a0 { position: absolute; inset-inline-end: var(--pad); top: 17%; width: 48%; height: 38%; }
+  .start-story { grid-column: 9 / span 4; font-size: clamp(1rem, 0.5vw + 0.85rem, 1.25rem); line-height: 1.45; }
+  .start-cue { align-self: center; justify-self: start; margin-inline-start: var(--pad); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; color: var(--muted); }
+  .cue-hint { color: var(--muted); }
+  .cue-arrow { font-size: 1.4rem; animation: rise 1.8s var(--ease) infinite; }
+  @keyframes rise { 0% { transform: translateY(10px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-14px); opacity: 0; } }
+  .start-title { font-size: clamp(3rem, 7.4vw, 10.5rem); padding-inline: var(--pad); }
+  :global(.calm) .start-cue, :global(html:not(.ascent)) .start-cue { visibility: hidden; }
+  :lang(ar) .start-title { font-size: clamp(3rem, 9vw, 10rem); }
+  .start-actions { align-items: center; row-gap: 14px; }
+  .start-actions .act { grid-column: 1 / span 3; justify-self: start; }
+  .start-actions .ul { grid-column: 4 / span 3; justify-self: start; font-size: 0.95rem; }
+  .start-id { grid-column: 8 / span 5; justify-self: end; color: var(--muted); text-align: end; }
+
+  /* 01 · Understand */
+  .u-grid { align-items: start; row-gap: 40px; }
+  .u-text { grid-column: 1 / span 5; display: grid; gap: 40px; }
+  .u-chat { grid-column: 7 / span 6; }
+  .rules > li { display: grid; grid-template-columns: 2.4rem 1fr; column-gap: 12px; padding: 12px 0; color: var(--muted); transition: color 0.4s; }
+  .rules .rt { font-weight: 600; color: inherit; }
+  .rules .rb { grid-column: 2; font-size: 0.9rem; }
+  .rules > li.is-on { color: var(--fg); }
+  .rules > li.is-on .mono { color: var(--accent); }
+
+  /* 02 · Route */
+  .r-grid { align-items: end; row-gap: 40px; }
+  .r-text { grid-column: 1 / span 5; display: grid; gap: 28px; justify-items: start; }
+  .points { width: 100%; }
+  .points li { display: flex; gap: 16px; padding: 12px 0; }
+  .r-big { grid-column: 7 / span 6; display: grid; justify-items: end; text-align: end; }
+  .r-num { font-size: clamp(10rem, 30vw, 34rem); line-height: 0.78; font-weight: 900; font-stretch: 50%; }
+  .r-cap { max-width: 22ch; color: var(--muted); }
+  .a2 { width: min(100%, 26rem); margin-top: 18px; aspect-ratio: 1.2; display: flex; align-items: flex-end; justify-content: flex-end; }
+  :global(.scene-on) .r-tiles { visibility: hidden; }
+  .r-tiles { display: grid; grid-template-columns: repeat(15, 12px); gap: 5px; margin-top: 18px; }
+  .r-tiles i { width: 12px; height: 12px; border: 1px solid var(--rule-strong); transition: background-color 0.3s; }
+  .r-tiles i.on { background: var(--accent); border-color: var(--accent); }
+
+  /* 03 · Report */
+  .rep-grid { row-gap: 40px; align-items: end; }
+  .rep-grid .lead { grid-column: 1 / span 5; }
+  .a3 { grid-column: 7 / span 6; align-self: stretch; min-height: 16rem; }
+  .rep-rows { grid-column: 1 / -1; }
+  .rep-rows li { display: grid; grid-template-columns: 1.3fr 2fr 2fr; gap: var(--gap); align-items: center; padding: 18px 0; }
+  .rk { font-size: clamp(1.6rem, 3.4vw, 3.4rem); line-height: 1; }
+  .rv { color: var(--muted); }
+  .rbar { height: 1px; background: var(--rule); position: relative; }
+  .rbar i { position: absolute; inset-block: -3px; inset-inline-start: 0; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+  [dir='rtl'] .rbar i { transform-origin: right; }
+
+  /* 04 · Interface */
+  .i-lead { grid-column: 1 / span 6; }
+  .a4 { grid-column: 7 / span 6; min-height: 15rem; }
+  .steps { row-gap: 28px; }
+  .steps li { grid-column: span 3; display: grid; gap: 8px; align-content: start; padding-top: 14px; border-top: 1px solid var(--rule); position: relative; }
+  .steps li::before { content: ''; position: absolute; top: -1px; inset-inline-start: 0; width: 100%; height: 1px; background: var(--fg); transform: scaleX(var(--fill, 0)); transform-origin: left; }
+  [dir='rtl'] .steps li::before { transform-origin: right; }
+  .st { font-size: clamp(1.4rem, 2.2vw, 2.2rem); line-height: 1; }
+  .sm { color: var(--accent); }
+  .sb { color: var(--muted); font-size: 0.95rem; }
+  .offers { border-top: 1px solid var(--rule); }
+  .offer { position: relative; isolation: isolate; align-items: baseline; padding-block: 22px; border-bottom: 1px solid var(--rule); transition: color 0.45s var(--ease); }
+  .offer::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--fg); transform: scaleY(0); transform-origin: 50% 100%; transition: transform 0.6s var(--ease); }
+  .offer:hover, .offer:focus-visible { color: var(--bg); }
+  .offer:hover::before, .offer:focus-visible::before { transform: scaleY(1); }
+  .offer > .mono:first-child { grid-column: 1; }
+  .on { grid-column: 2 / span 4; font-size: clamp(1.5rem, 2.6vw, 2.8rem); line-height: 1; }
+  .ot { grid-column: 6 / span 2; }
+  .ob { grid-column: 8 / span 4; font-size: 0.95rem; }
+  .oa { grid-column: 12; justify-self: end; font-size: 1.4rem; transition: transform 0.5s var(--ease); }
+  .offer:hover .oa { transform: translate(4px, -4px); }
+  [dir='rtl'] .offer:hover .oa { transform: translate(-4px, -4px) scaleX(-1); }
+  [dir='rtl'] .oa { transform: scaleX(-1); }
+  .note { color: var(--muted); margin-top: 16px; }
+
+  /* 05 · Human */
+  .h-story { grid-column: 1 / span 10; font-size: clamp(1.4rem, 2.6vw, 2.9rem); line-height: 1.18; font-weight: 500; letter-spacing: -0.01em; }
+  .h-story :global(.w) { opacity: 0.18; transition: opacity 0.3s; }
+  .h-story :global(.w.lit) { opacity: 1; }
+  .h-grid { align-items: start; row-gap: 32px; }
+  .h-facts { grid-column: 1 / span 6; }
+  .h-facts div { display: grid; grid-template-columns: 1fr 1.6fr; gap: var(--gap); padding: 12px 0; border-top: 1px solid var(--rule); }
+  .h-facts div:last-child { border-bottom: 1px solid var(--rule); }
+  .h-facts dt { color: var(--muted); }
+  .h-links { grid-column: 8 / span 5; display: flex; flex-wrap: wrap; gap: 12px; align-content: start; }
+
+  /* 06 · Output */
+  .faq-list { border-top: 1px solid var(--rule); }
+  .faq details { border-bottom: 1px solid var(--rule); }
+  .faq summary { list-style: none; cursor: pointer; align-items: baseline; padding-block: 18px; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq summary > .mono:first-child { grid-column: 1; }
+  .fq { grid-column: 2 / span 9; font-size: clamp(1.1rem, 1.6vw, 1.6rem); font-weight: 600; line-height: 1.2; }
+  .fx { grid-column: 12; justify-self: end; }
+  .fx::before { content: '+'; font-size: 1.1rem; }
+  details[open] .fx::before { content: '−'; }
+  .fa { grid-column: 2 / span 7; padding-bottom: 22px; color: var(--muted); max-width: 60ch; }
+  .contact { row-gap: 36px; align-items: end; }
+  .contact-title { grid-column: 1 / -1; padding-inline: 0; }
+  .contact-text { grid-column: 1 / span 6; display: grid; gap: 24px; }
+  .avail { display: flex; align-items: center; gap: 10px; }
+  .contact-links li { display: grid; grid-template-columns: 6rem 1fr auto; gap: var(--gap); align-items: baseline; padding: 12px 0; }
+  .contact-links .mono { color: var(--muted); }
+  .cp { color: var(--muted); }
+  .cp:hover { color: var(--fg); }
+  .circle {
+    grid-column: 9 / span 4; justify-self: center; align-self: center;
+    width: clamp(160px, 17vw, 260px); aspect-ratio: 1; border-radius: 50%;
+    background: var(--fg); color: var(--bg); display: grid; place-items: center;
+    transition: transform 0.5s var(--ease);
+  }
+  .circle-in { display: flex; gap: 10px; align-items: center; font-family: var(--mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; font-stretch: 87.5%; }
+  .circle:hover { transform: scale(1.06); }
+  .marquee { overflow: hidden; border-block: 1px solid var(--rule); padding-block: 2vh; }
+  .marquee-track { display: flex; width: max-content; font-size: clamp(3rem, 10vw, 12rem); line-height: 1; will-change: transform; }
+  .marquee-track span { display: flex; align-items: center; gap: 0.3em; padding-inline-end: 0.3em; white-space: nowrap; }
+  .marquee-track .key { width: 0.28em; height: 0.28em; }
+  .outro { display: grid; gap: 2vh; padding-top: 72px; }
+  .outro-meta { color: var(--muted); row-gap: 10px; }
+  .outro-meta > :nth-child(1) { grid-column: 1 / span 4; }
+  .outro-meta > :nth-child(2) { grid-column: 5 / span 3; justify-self: start; }
+  .outro-meta > :nth-child(3) { grid-column: 8 / span 1; }
+  .outro-meta > :nth-child(4) { grid-column: 9 / span 4; justify-self: end; }
+  .outro-name { display: inline-block; font-size: 10vw; line-height: 0.82; font-weight: 900; font-stretch: 150%; white-space: nowrap; margin-inline: var(--pad); }
+  :lang(ar) .outro-name { font-size: 15vw; line-height: 1.1; }
+
+  @media (max-width: 900px) {
+    .start-id { grid-column: 1 / -1; justify-self: start; text-align: start; }
+    .a0 { top: 27%; width: 92%; height: 17%; }
+    .title-row .ch-title { grid-column: 1 / -1; }
+    .title-row .anchor, .a3, .a4 { grid-column: 1 / -1; min-height: 11rem; }
+    .start-story { grid-column: 1 / -1; grid-row: 2; margin-top: 12px; }
+    .start-actions .act { grid-column: 1 / span 7; }
+    .start-actions .ul { grid-column: 8 / span 5; justify-self: end; }
+    .u-text, .u-chat, .r-text, .r-big, .rep-grid .lead, .i-lead, .h-story, .h-facts, .h-links, .contact-text { grid-column: 1 / -1; }
+    .r-big { justify-items: start; text-align: start; }
+    .steps li { grid-column: span 6; }
+    .rep-rows li { grid-template-columns: 1fr 1.6fr; }
+    .rbar { grid-column: 1 / -1; }
+    .on { grid-column: 2 / span 11; }
+    .ot { grid-column: 2 / span 5; }
+    .ob { grid-column: 2 / span 11; }
+    .oa { grid-column: 12; grid-row: 1; }
+    .fq { grid-column: 2 / span 10; }
+    .fa { grid-column: 2 / span 11; }
+    .circle { grid-column: 1 / -1; justify-self: start; }
+    .outro-meta > * { grid-column: 1 / -1 !important; justify-self: start !important; }
+  }
+  @media (max-width: 560px) {
+    .steps li { grid-column: 1 / -1; }
+  }
+</style>

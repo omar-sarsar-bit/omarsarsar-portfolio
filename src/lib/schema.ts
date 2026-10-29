@@ -35,10 +35,10 @@ export function serviceSchema(lang: Lang) {
     description: d.meta.description,
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
-      name: d.services.eyebrow,
-      itemListElement: d.services.items.map((s) => ({
+      name: d.meta.role,
+      itemListElement: [d.understand, d.route, d.report, d.interface].map((s) => ({
         '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: s.title, description: s.body },
+        itemOffered: { '@type': 'Service', name: s.service, description: s.body },
       })),
     },
   };
@@ -49,7 +49,7 @@ export function faqSchema(lang: Lang) {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: d.faq.items.map((f) => ({
+    mainEntity: d.output.faq.map((f) => ({
       '@type': 'Question',
       name: f.q,
       acceptedAnswer: { '@type': 'Answer', text: f.a },
@@ -62,7 +62,7 @@ export function caseStudySchema(lang: Lang) {
   return {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: d.caseStudy.heading,
+    headline: `${d.caseStudy.heading.join(' ')} ${d.caseStudy.sub}`,
     description: d.caseStudy.description,
     inLanguage: lang,
     author: { '@id': `${site.url}/#person` },

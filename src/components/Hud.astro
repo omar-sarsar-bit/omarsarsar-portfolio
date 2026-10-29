@@ -1,0 +1,42 @@
+---
+// Execution log in the corner: one line is appended each time a chapter "executes".
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const d = t(Astro.props.lang);
+---
+
+<aside class="hud" aria-hidden="true" data-log-names={JSON.stringify(d.log)}>
+  <div class="hud-log mono ltr" data-log>
+    <p class="run"><span class="key"></span> {d.ui.run} #<span data-run>0427</span> · {d.log[0]}</p>
+  </div>
+  <p class="hud-meter mono"><span class="ltr" data-meter>000</span>% · {d.ui.progress}</p>
+  <div class="rail" data-rail>
+    <ol>{d.chapters.map((_, i) => <li class="mono ltr">{String(6 - i).padStart(2, '0')}</li>)}</ol>
+    <span class="rail-mark" data-rail-mark><span class="key"></span></span>
+  </div>
+</aside>
+
+<style>
+  .hud {
+    position: fixed; top: 0; inset-inline: 0; z-index: 90; pointer-events: none;
+    display: flex; justify-content: space-between; align-items: flex-start;
+    padding: calc(14px + env(safe-area-inset-top, 0px)) var(--pad) 0;
+    color: var(--muted); transition: color 0.8s var(--ease);
+  }
+  :global(html:not(.ascent)) .hud { display: none; }
+  .hud-log { display: grid; gap: 2px; text-align: left; }
+  .hud-log :global(p) { display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+  .hud-log :global(.ok) { color: var(--accent); }
+  .hud-log :global(.ms) { opacity: 0.6; }
+  .run .key { width: 6px; height: 6px; }
+  .rail { position: fixed; inset-inline-end: 10px; top: 22vh; bottom: calc(var(--dock) + 10vh); width: 22px; border-inline-end: 1px solid var(--rule); }
+  .rail ol { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; padding-inline-end: 8px; }
+  .rail li { font-size: 0.56rem; opacity: 0.7; }
+  .rail-mark { position: absolute; inset-inline-end: -5px; bottom: 0; transform: translateY(50%); }
+  .rail-mark .key { width: 9px; height: 9px; }
+  @media (max-width: 860px) {
+    .hud-log :global(p:not(:last-child)) { display: none; }
+    .rail { display: none; }
+  }
+</style>

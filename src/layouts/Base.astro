@@ -1,15 +1,19 @@
 ---
-import '@fontsource-variable/bricolage-grotesque/opsz.css';
-import '@fontsource-variable/instrument-sans';
-import '@fontsource-variable/readex-pro';
-import '@fontsource-variable/jetbrains-mono';
+import '@fontsource-variable/anybody/wdth.css';
+import '@fontsource-variable/schibsted-grotesk';
+import '@fontsource-variable/readex-pro/hexp.css';
+import '@fontsource-variable/martian-mono/wdth.css';
 import '../styles/global.css';
-import bricolageLatin from '@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-opsz-normal.woff2?url';
-import readexArabic from '@fontsource-variable/readex-pro/files/readex-pro-arabic-wght-normal.woff2?url';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
+import anybodyLatin from '@fontsource-variable/anybody/files/anybody-latin-wdth-normal.woff2?url';
+import readexArabic from '@fontsource-variable/readex-pro/files/readex-pro-arabic-hexp-normal.woff2?url';
+import readexLatin from '@fontsource-variable/readex-pro/files/readex-pro-latin-hexp-normal.woff2?url';
+import martianLatin from '@fontsource-variable/martian-mono/files/martian-mono-latin-wdth-normal.woff2?url';
+import Preloader from '../components/Preloader.astro';
+import Cursor from '../components/Cursor.astro';
+import Hud from '../components/Hud.astro';
+import Dock from '../components/Dock.astro';
 import { site } from '../config/site';
-import { THEME_INIT } from '../scripts/theme-init.mjs';
+import { BOOT } from '../scripts/boot.mjs';
 import { t, localePath, type Lang } from '../i18n';
 
 interface Props {
@@ -21,9 +25,12 @@ interface Props {
   ogType?: 'website' | 'article';
   jsonLd?: Record<string, unknown>[];
   noindex?: boolean;
+  /** Reverse the page: it opens at the bottom and scrolling down climbs up. */
+  ascent?: boolean;
+  tone?: 'paper' | 'cobalt' | 'ink';
 }
 
-const { lang, title, description, route, ogType = 'website', jsonLd = [], noindex = false } = Astro.props;
+const { lang, title, description, route, ogType = 'website', jsonLd = [], noindex = false, ascent = false, tone = 'paper' } = Astro.props;
 const d = t(lang);
 const abs = (path: string) => new URL(path, site.url).href;
 const canonical = route ? abs(localePath(lang, route)) : undefined;
@@ -31,7 +38,7 @@ const ogImage = abs(`/og/${lang}.png`);
 ---
 
 <!doctype html>
-<html lang={lang} dir={d.meta.dir}>
+<html lang={lang} dir={d.meta.dir} data-tone={tone} data-ascent={ascent ? '' : undefined}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -64,30 +71,29 @@ const ogImage = abs(`/og/${lang}.png`);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
 
-    <meta name="theme-color" content="#0A0D1C" />
-    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#EBEBE6" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
+    {(lang === 'ar' ? [readexArabic, readexLatin, martianLatin] : [anybodyLatin, martianLatin]).map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
 
-    {lang === 'en' && <link rel="preload" href={bricolageLatin} as="font" type="font/woff2" crossorigin />}
-    {lang === 'ar' && <link rel="preload" href={readexArabic} as="font" type="font/woff2" crossorigin />}
-
-    <script is:inline set:html={THEME_INIT} />
-
+    <script is:inline set:html={BOOT} />
     {jsonLd.map((item) => <script type="application/ld+json" set:html={JSON.stringify(item)} />)}
   </head>
   <body>
-    <a class="skip" href="#main">{d.nav.skip}</a>
-    <Header lang={lang} route={route} />
-    <main id="main">
+    <a class="skip" href="#main">{d.ui.skip}</a>
+    <Preloader lang={lang} />
+    <Cursor />
+    {ascent && <Hud lang={lang} />}
+    <slot name="backdrop" />
+    <main id="main" data-world>
       <slot />
     </main>
-    <Footer lang={lang} route={route} />
+    <Dock lang={lang} route={route} />
     <script>
-      import '../scripts/site';
+      import '../scripts/app';
     </script>
   </body>
 </html>

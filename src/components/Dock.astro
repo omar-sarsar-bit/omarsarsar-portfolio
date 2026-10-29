@@ -1,0 +1,116 @@
+---
+// The navigation lives at the bottom of the screen: the site is climbed from there.
+import LogoMark from './LogoMark.astro';
+import Roll from './Roll.astro';
+import { site, whatsappLink } from '../config/site';
+import { t, localePath, otherLang, type Lang } from '../i18n';
+
+interface Props { lang: Lang; route?: string }
+const { lang, route } = Astro.props;
+const d = t(lang);
+export const chapterIds = ['start', 'understand', 'route', 'report', 'interface', 'human', 'output'];
+const home = localePath(lang, '/');
+const onHome = route === '/';
+const href = (id: string) => (onHome ? `#${id}` : `${home}#${id}`);
+const pad = (n: number) => String(n).padStart(2, '0');
+const switchHref = localePath(otherLang(lang), route ?? '/');
+const name = lang === 'ar' ? site.nameAr : site.name;
+---
+
+<nav class="dock" aria-label={d.ui.index} data-dock>
+  <span class="dock-progress" aria-hidden="true"><i data-progress></i></span>
+  <a class="dock-brand" href={home} aria-label={name} data-cursor-text={d.ui.cursorOpen}>
+    <LogoMark size={26} />
+    <span class="dock-name">{name}</span>
+  </a>
+
+  <ol class="dock-index">
+    {
+      d.chapters.map((c, i) => (
+        <li>
+          <a href={href(chapterIds[i])} data-goto={onHome ? chapterIds[i] : undefined} data-index={i}>
+            <span class="mono ltr">{pad(i)}</span>
+            <span class="nm">{c}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+
+  <p class="dock-now mono" aria-hidden="true"><span data-now-index>00</span> <span data-now-name>{d.chapters[0]}</span></p>
+
+  <div class="dock-end">
+    <a class="dock-lang mono" href={switchHref} hreflang={otherLang(lang)} lang={otherLang(lang)} aria-label={`${d.ui.switchTo} · ${d.ui.switchLabel}`}>{d.ui.switchTo}</a>
+    <a class="act dock-cta" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}>
+      <Roll text={d.ui.start} /><span class="arr" aria-hidden="true">↑</span>
+    </a>
+    <button class="dock-menu mono" type="button" aria-expanded="false" aria-controls="dock-sheet" data-sheet-toggle data-open={d.ui.index} data-close={d.ui.close}>{d.ui.index}</button>
+  </div>
+
+  <div class="dock-sheet" id="dock-sheet" data-sheet hidden>
+    <ol>
+      {
+        d.chapters.map((c, i) => (
+          <li>
+            <a href={href(chapterIds[i])} data-goto={onHome ? chapterIds[i] : undefined}>
+              <span class="mono ltr">{pad(i)}</span>
+              <span class="display">{c}</span>
+            </a>
+          </li>
+        ))
+      }
+    </ol>
+    <a class="act" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener"><Roll text={d.ui.start} /><span class="arr" aria-hidden="true">↑</span></a>
+  </div>
+</nav>
+
+<style>
+  .dock {
+    position: fixed; inset-inline: 0; bottom: 0; z-index: 100;
+    height: calc(var(--dock) + env(safe-area-inset-bottom, 0px));
+    padding: 0 var(--pad) env(safe-area-inset-bottom, 0px);
+    display: flex; align-items: center; gap: clamp(16px, 2.4vw, 40px);
+    background: var(--bg); color: var(--fg);
+    border-top: 1px solid var(--rule);
+    transition: background-color 0.8s var(--ease), color 0.8s var(--ease);
+  }
+  .dock-progress { position: absolute; inset-inline: 0; top: -1px; height: 1px; overflow: hidden; }
+  .dock-progress i { display: block; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+  [dir='rtl'] .dock-progress i { transform-origin: right; }
+  .dock-brand { display: flex; align-items: center; gap: 10px; flex: none; color: var(--fg); }
+  .dock-brand :global(svg) { --mark-bg: var(--fg); --mark-fg: var(--bg); }
+  .dock-name { font-family: var(--display); font-weight: 700; font-stretch: 112%; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.01em; }
+  :lang(ar) .dock-name { font-family: var(--arabic); text-transform: none; font-size: 1rem; }
+  .dock-index { display: flex; gap: clamp(10px, 1.6vw, 26px); margin-inline: auto; }
+  .dock-index a { display: flex; align-items: baseline; gap: 6px; padding: 8px 0; color: var(--muted); transition: color 0.3s; position: relative; }
+  .dock-index a::after { content: ''; position: absolute; inset-inline: 0; bottom: 2px; height: 1px; background: var(--accent); transform: scaleX(0); transition: transform 0.5s var(--ease); }
+  .dock-index a:hover, .dock-index a.is-active { color: var(--fg); }
+  .dock-index a.is-active::after { transform: scaleX(1); }
+  .dock-index .nm { font-size: 0.82rem; font-weight: 500; }
+  .dock-now { display: none; margin-inline: auto; }
+  .dock-end { display: flex; align-items: center; gap: 14px; flex: none; }
+  .dock-lang { padding: 8px 6px; font-size: 0.78rem; }
+  .dock-lang:lang(ar) { font-family: var(--arabic); font-size: 0.95rem; text-transform: none; }
+  .dock-cta { padding: 0.8em 1.1em; }
+  .dock-menu { display: none; padding: 10px 0; }
+  .dock-sheet {
+    position: absolute; inset-inline: 0; bottom: 100%;
+    background: var(--bg); border-top: 1px solid var(--rule);
+    padding: 24px var(--pad); display: grid; gap: 24px;
+  }
+  .dock-sheet[hidden] { display: none; }
+  .dock-sheet ol { display: grid; }
+  .dock-sheet li a { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-top: 1px solid var(--rule); }
+  .dock-sheet .display { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+
+  @media (max-width: 1180px) {
+    .dock-index .nm { display: none; }
+    .dock-index a.is-active .nm { display: inline; }
+  }
+  @media (max-width: 860px) {
+    .dock-index, .dock-cta { display: none; }
+    .dock-now { display: block; }
+    .dock-menu { display: block; }
+    .dock-name { display: none; }
+  }
+</style>

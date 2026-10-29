@@ -1,0 +1,57 @@
+---
+// One chapter of the ascent. The title block (index, name, service, node) sits like the
+// title block of a technical drawing; the outlined numeral marks the real sequence.
+import { t, type Lang } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  id: string;
+  index: number;
+  tone: 'paper' | 'cobalt' | 'ink';
+  node: string;
+  service?: string;
+  class?: string;
+}
+const { lang, id, index, tone, node, service, class: className } = Astro.props;
+const d = t(lang);
+const pad = String(index).padStart(2, '0');
+---
+
+<section class:list={['ch', className]} id={id} data-ch={index} data-tone={tone} aria-labelledby={`${id}-h`}>
+  <span class="ch-num display ltr" aria-hidden="true" data-num>{pad}</span>
+  <div class="ch-inner stack">
+    <header class="ch-meta mono">
+      <span class="ltr">{pad}</span>
+      <span>{d.chapters[index]}</span>
+      {service && <span class="svc">{service}</span>}
+      <span class="node ltr">node: {node}</span>
+    </header>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .ch {
+    position: relative; min-height: 100svh;
+    padding: clamp(72px, 9vh, 120px) 0 calc(var(--dock) + clamp(28px, 5vh, 64px));
+    display: flex; flex-direction: column; justify-content: flex-end;
+    overflow: hidden;
+  }
+  .ch-inner { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(28px, 5vh, 56px); }
+  :global(.ascent) .ch-inner { flex-direction: column-reverse; }
+  .ch-meta {
+    display: grid; grid-template-columns: 3rem 1fr 2fr auto; gap: var(--gap); align-items: baseline;
+    margin-inline: var(--pad); padding-top: 10px; border-top: 1px solid var(--rule-strong); color: var(--muted);
+  }
+  .ch-meta .node { justify-self: end; grid-column: -2 / -1; }
+  .ch-num {
+    position: absolute; z-index: 0; inset-inline-end: calc(var(--pad) * -0.4); bottom: calc(var(--dock) + 2vh);
+    font-size: clamp(9rem, 30vw, 30rem); line-height: 0.75; font-weight: 800; font-stretch: 60%;
+    color: transparent; -webkit-text-stroke: 1px var(--rule-strong);
+    pointer-events: none; user-select: none;
+  }
+  @media (max-width: 760px) {
+    .ch-meta { grid-template-columns: 2.4rem 1fr auto; }
+    .ch-meta .svc { display: none; }
+  }
+</style>

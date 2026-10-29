@@ -2,10 +2,17 @@
 
 Bilingual (English / العربية) portfolio for Omar Sarsar, AI Automation & Product Builder.
 
-- **Stack:** [Astro](https://astro.build) 7, TypeScript (strict), plain CSS with design tokens, self-hosted variable fonts.
+**Concept: The Ascent.** The home page opens at the bottom and scrolling down climbs up. The story follows a single request through the system: received, understood, routed, reported, shown, and finally running on autopilot. The navigation lives in a dock at the bottom of the screen.
+
+- **Stack:** [Astro](https://astro.build) 7, TypeScript (strict), GSAP (ScrollTrigger, SplitText), Lenis smooth scroll, Three.js (lazy-loaded), plain CSS with design tokens.
+- **Type:** Anybody (variable width, animated with the scroll), Schibsted Grotesk, Martian Mono, Readex Pro for Arabic. All self-hosted.
 - **Languages:** English at `/`, Arabic (right-to-left) at `/ar/`. Every page has a language twin linked with `hreflang`.
 - **No third-party scripts.** Strict Content Security Policy generated at build time, security headers in `vercel.json`.
-- **Motion:** scroll reveals, split-word headings, scroll-linked process line, interactive dot canvas, pointer tilt and spotlight, magnetic buttons, a live workflow simulation and a scripted agent demo. All of it switches off for visitors who prefer reduced motion.
+- **Accessible by design:** the document order stays logical (only the visual order is reversed), keyboard focus moves the view, and visitors who prefer reduced motion get a normal, static page.
+
+### How the ascent works
+
+`src/scripts/ascent.ts` pins the page content to the bottom of the screen with its chapters stacked upwards (`column-reverse`). A spacer gives the document its height, so native scrolling, the scrollbar and the keyboard all keep working, and each frame the content is translated by the scroll position. Lenis smooths the wheel and GSAP's ticker drives the frame. `src/scripts/scene.ts` pins each 3D object to an empty `data-anchor` box in the layout, so it travels with the page and never covers body text.
 
 ## Edit the content
 
@@ -14,8 +21,10 @@ Bilingual (English / العربية) portfolio for Omar Sarsar, AI Automation & 
 | Email, WhatsApp, LinkedIn, IconScout links | `src/config/site.ts` |
 | English text | `src/i18n/en.ts` |
 | Arabic text | `src/i18n/ar.ts` (must have the same shape as English; the build fails if a field is missing) |
-| Demo conversations and hero messages | `src/i18n/demo-scripts.ts` |
-| Colors, type scale, spacing | `src/styles/global.css` |
+| Demo conversations and the message slips in 3D | `src/i18n/demo-scripts.ts` |
+| Colours, type, buttons, grid | `src/styles/global.css` |
+| Home chapters | `src/components/HomePage.astro` |
+| Case study | `src/components/CaseStudyPage.astro` |
 | Social preview images | `public/og/en.png`, `public/og/ar.png` |
 
 The LinkedIn button appears automatically once `linkedin` in `src/config/site.ts` has your profile URL.

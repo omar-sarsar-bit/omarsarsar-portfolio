@@ -1,39 +1,41 @@
 ---
 import Base from '../layouts/Base.astro';
+import Roll from '../components/Roll.astro';
 import { t, localePath } from '../i18n';
 
-const en = t('en').notFound;
-const ar = t('ar').notFound;
+const en = t('en');
+const ar = t('ar');
 ---
 
-<Base lang="en" title={en.title} description={en.body} noindex>
-  <section class="nf">
-    <div class="container">
-      <p class="code mono" aria-hidden="true">404</p>
-      <div class="pair">
-        <div>
-          <h1>{en.heading}</h1>
-          <p>{en.body}</p>
-          <a class="btn btn-primary" href={localePath('en', '/')}>{en.cta}</a>
-        </div>
-        <div lang="ar" dir="rtl">
-          <h2>{ar.heading}</h2>
-          <p>{ar.body}</p>
-          <a class="btn btn-ghost" href={localePath('ar', '/')}>{ar.cta}</a>
-        </div>
+<Base lang="en" title={en.notFound.title} description={en.notFound.body} noindex tone="ink">
+  <section class="nf" data-tone="ink" data-section>
+    <p class="nf-code display ltr" aria-hidden="true">404</p>
+    <div class="grid nf-pair">
+      <div>
+        <h1 class="display nf-title" data-title>{en.notFound.heading.map((l) => <span class="line">{l}</span>)}</h1>
+        <p class="nf-body">{en.notFound.body}</p>
+        <a class="act" href={localePath('en', '/')}><Roll text={en.notFound.cta} /><span class="arr" aria-hidden="true">↓</span></a>
+      </div>
+      <div lang="ar" dir="rtl">
+        <h2 class="display nf-title">{ar.notFound.heading.map((l) => <span class="line">{l}</span>)}</h2>
+        <p class="nf-body">{ar.notFound.body}</p>
+        <a class="act" href={localePath('ar', '/')}><Roll text={ar.notFound.cta} /><span class="arr" aria-hidden="true">↓</span></a>
       </div>
     </div>
   </section>
+  <script>
+    import '../scripts/editorial';
+  </script>
 </Base>
 
 <style>
-  .nf { padding-block: clamp(64px, 10vw, 140px); }
-  .code { font-size: clamp(5rem, 18vw, 12rem); font-weight: 700; line-height: 1; letter-spacing: -0.04em; color: transparent; -webkit-text-stroke: 1.5px var(--line-strong); margin-bottom: 32px; }
-  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
-  .pair > div { display: grid; gap: 16px; justify-items: start; align-content: start; }
-  h1, h2 { font-size: var(--step-3); }
-  [lang='ar'] { font-family: var(--font-ar); }
-  [lang='ar'] h2 { font-family: var(--font-ar); letter-spacing: 0; line-height: 1.3; }
-  p { color: var(--fg-2); }
-  @media (max-width: 760px) { .pair { grid-template-columns: 1fr; } }
+  .nf { min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; padding: 10vh 0 calc(var(--dock) + 8vh); }
+  .nf-code { font-size: clamp(8rem, 34vw, 36rem); line-height: 0.76; font-weight: 900; font-stretch: 150%; color: transparent; -webkit-text-stroke: 1px var(--fg); padding-inline: var(--pad); }
+  .nf-pair { row-gap: 48px; margin-top: 4vh; }
+  .nf-pair > div { grid-column: span 6; display: grid; gap: 20px; justify-items: start; align-content: start; }
+  .nf-title { font-size: clamp(2rem, 4.6vw, 5rem); }
+  [lang='ar'] .nf-title { font-family: var(--arabic); text-transform: none; line-height: 1.2; }
+  [lang='ar'] { font-family: var(--arabic); }
+  .nf-body { color: var(--muted); max-width: 40ch; }
+  @media (max-width: 760px) { .nf-pair > div { grid-column: 1 / -1; } }
 </style>
