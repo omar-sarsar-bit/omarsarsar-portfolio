@@ -173,7 +173,7 @@ function startAscent() {
     bars.forEach((b, k) => (b.style.transform = `scaleX(${clamp((pr[3] - 0.28 - k * 0.07) / 0.3)})`));
     steps.forEach((li, k) => li.style.setProperty('--fill', String(clamp((pr[4] - 0.22 - k * 0.06) / 0.18))));
     if (litWords.length) {
-      const n = Math.round(clamp((pr[5] - 0.2) / 0.45) * litWords.length);
+      const n = Math.round(clamp((pr[6] - 0.2) / 0.45) * litWords.length);
       if (n !== lastLit) {
         lastLit = n;
         litWords.forEach((w, k) => w.classList.toggle('lit', k < n));
@@ -190,7 +190,7 @@ function startAscent() {
   let mx = 0;
   let mdir = -1;
   gsap.ticker.add(() => {
-    if (!track || state.chapterProgress[6] <= 0) return;
+    if (!track || state.chapterProgress[7] <= 0) return;
     if (lenis.direction) mdir = lenis.direction > 0 ? -1 : 1;
     const speed = 0.6 + Math.min(18, Math.abs(lenis.velocity) * 0.35);
     mx += speed * mdir;

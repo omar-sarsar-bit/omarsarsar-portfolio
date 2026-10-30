@@ -2,7 +2,7 @@
 
 Bilingual (English / العربية) portfolio for Omar Sarsar, AI Automation & Product Builder.
 
-**Concept: The Ascent.** The home page opens at the bottom and scrolling down climbs up. The story follows a single request through the system: received, understood, routed, reported, shown, and finally running on autopilot. The navigation lives in a dock at the bottom of the screen.
+**Concept: The Ascent.** The home page opens at the bottom and scrolling down climbs up. The story follows a single request through the system: received, understood, routed, reported, shown, then the work, the person behind it, and finally everything running on autopilot. "With Omar, you don't go down. You go up." The navigation lives in a dock at the bottom of the screen.
 
 - **Stack:** [Astro](https://astro.build) 7, TypeScript (strict), GSAP (ScrollTrigger, SplitText), Lenis smooth scroll, Three.js (lazy-loaded), plain CSS with design tokens.
 - **Type:** Anybody (variable width, animated with the scroll), Schibsted Grotesk, Martian Mono, Readex Pro for Arabic. All self-hosted.
@@ -24,10 +24,11 @@ Bilingual (English / العربية) portfolio for Omar Sarsar, AI Automation & 
 | Demo conversations and the message slips in 3D | `src/i18n/demo-scripts.ts` |
 | Colours, type, buttons, grid | `src/styles/global.css` |
 | Home chapters | `src/components/HomePage.astro` |
+| Project index (client work, agency work, concept builds) | `work.projects` in `src/i18n/en.ts` and `ar.ts`; drawings in `src/components/WorkPreview.astro` |
 | Case study | `src/components/CaseStudyPage.astro` |
 | Social preview images | `public/og/en.png`, `public/og/ar.png` |
 
-The LinkedIn button appears automatically once `linkedin` in `src/config/site.ts` has your profile URL.
+Concept builds are labelled as such on the site. When one becomes real client work, change its `kind` and `link` in the project list.
 
 ## Run locally
 

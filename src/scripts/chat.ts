@@ -1,7 +1,7 @@
 // Plays a scripted transcript line by line and lights the prompt rule behind each agent reply.
 // The full conversation is already in the HTML, so nothing is lost without JavaScript.
 
-import type { DemoLang, DemoScript } from '../i18n/demo-scripts';
+import type { DemoScript, ScriptSet } from '../i18n/demo-scripts';
 import { calm } from './state';
 
 const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
@@ -9,17 +9,17 @@ const wait = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 interface Labels { user: string; agent: string; routed: string }
 
 export interface ChatPlayer {
-  play: (lang?: DemoLang) => void;
+  play: (key?: string) => void;
 }
 
 export function setupChat(root: HTMLElement, rulesRoot?: ParentNode | null): ChatPlayer {
-  const scripts = JSON.parse(root.querySelector('[data-scripts]')?.textContent ?? '{}') as Record<DemoLang, DemoScript>;
+  const scripts = JSON.parse(root.querySelector('[data-scripts]')?.textContent ?? '{}') as ScriptSet;
   const labels = JSON.parse(root.dataset.labels ?? '{}') as Labels;
   const thread = root.querySelector<HTMLElement>('[data-thread]')!;
   const route = root.querySelector<HTMLElement>('[data-route]')!;
-  const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-lang]'));
+  const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-key]'));
   const rules = Array.from((rulesRoot ?? document).querySelectorAll<HTMLElement>('[data-rule]'));
-  let current = (root.dataset.initial as DemoLang) ?? 'en';
+  let current = root.dataset.initial ?? Object.keys(scripts)[0];
   let run = 0;
 
   const light = (ids: number[] = []) => rules.forEach((r, i) => r.classList.toggle('is-on', ids.includes(i)));
@@ -48,13 +48,13 @@ export function setupChat(root: HTMLElement, rulesRoot?: ParentNode | null): Cha
     return li;
   };
 
-  async function play(lang: DemoLang = current) {
+  async function play(key: string = current) {
     const id = ++run;
-    const s = scripts[lang];
-    current = lang;
-    tabs.forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.lang === lang)));
+    const s = scripts[key];
+    current = key;
+    tabs.forEach((t) => t.setAttribute('aria-pressed', String(t.dataset.key === key)));
     thread.setAttribute('dir', s.dir);
-    thread.setAttribute('lang', lang);
+    thread.setAttribute('lang', s.lang);
     thread.replaceChildren();
     route.style.opacity = '0';
     route.lastChild!.textContent = ` ${s.route}`;
@@ -86,7 +86,7 @@ export function setupChat(root: HTMLElement, rulesRoot?: ParentNode | null): Cha
     route.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400 });
   }
 
-  tabs.forEach((t) => t.addEventListener('click', () => play(t.dataset.lang as DemoLang)));
+  tabs.forEach((t) => t.addEventListener('click', () => play(t.dataset.key)));
   root.querySelector('[data-replay]')?.addEventListener('click', () => play(current));
   return { play };
 }

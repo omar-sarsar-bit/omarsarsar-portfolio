@@ -1,16 +1,18 @@
 ---
 // A conversation shown as a transcript: timestamps, speaker, the prompt rules applied, then the routing.
+// `set="home"` shows business scenarios, `set="case"` the case-study intake in three languages.
 import { t, type Lang } from '../i18n';
-import { demoScripts, type DemoLang } from '../i18n/demo-scripts';
+import { homeScripts, caseScripts } from '../i18n/demo-scripts';
 
-interface Props { lang: Lang }
-const { lang } = Astro.props;
+interface Props { lang: Lang; set?: 'home' | 'case' }
+const { lang, set = 'home' } = Astro.props;
 const d = t(lang);
-const initial: DemoLang = lang;
-const script = demoScripts[initial];
-const order: DemoLang[] = lang === 'ar' ? ['ar', 'en', 'fr'] : ['en', 'ar', 'fr'];
+const scripts = set === 'home' ? homeScripts : caseScripts;
+const order = set === 'home' ? (lang === 'ar' ? ['clinic', 'estate', 'store'] : ['estate', 'clinic', 'store']) : lang === 'ar' ? ['ar', 'en', 'fr'] : ['en', 'ar', 'fr'];
+const initial = order[0];
+const script = scripts[initial];
 const stamp = (i: number) => `02:00:${String(14 + i * 3).padStart(2, '0')}`;
-const labels = { user: d.demo.user, agent: d.demo.agent, routed: d.demo.routed, voice: script.voiceLabel };
+const labels = { user: d.demo.user, agent: d.demo.agent, routed: d.demo.routed };
 ---
 
 <div class="chat" data-chat data-initial={initial} data-labels={JSON.stringify(labels)}>
@@ -19,15 +21,15 @@ const labels = { user: d.demo.user, agent: d.demo.agent, routed: d.demo.routed, 
     <div class="chat-langs" role="group" aria-label={d.demo.langLabel}>
       {
         order.map((k) => (
-          <button type="button" data-lang={k} aria-pressed={k === initial ? 'true' : 'false'} lang={k}>
-            {k.toUpperCase()}
+          <button type="button" data-key={k} aria-pressed={k === initial ? 'true' : 'false'} class="ltr">
+            {scripts[k].tab}
           </button>
         ))
       }
     </div>
     <button type="button" class="replay" data-replay>↻ {d.demo.replay}</button>
   </div>
-  <ol class="chat-lines" data-thread dir={script.dir} lang={initial} aria-live="polite">
+  <ol class="chat-lines" data-thread dir={script.dir} lang={script.lang} aria-live="polite">
     {
       script.messages.map((m, i) => (
         <li class:list={['line', m.from]}>
@@ -44,7 +46,7 @@ const labels = { user: d.demo.user, agent: d.demo.agent, routed: d.demo.routed, 
   </ol>
   <p class="chat-route mono" data-route><span class="key"></span> {script.route}</p>
   <p class="chat-note mono">{d.demo.note}</p>
-  <script type="application/json" data-scripts set:html={JSON.stringify(demoScripts)} />
+  <script type="application/json" data-scripts set:html={JSON.stringify(scripts)} />
 </div>
 
 <style>

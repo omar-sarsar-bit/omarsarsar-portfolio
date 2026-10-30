@@ -1,0 +1,99 @@
+---
+// Small line drawings that stand in for project previews, in the site's own visual language.
+interface Props { kind: string }
+const { kind } = Astro.props;
+const cobalt = '#1F33D1';
+const amber = '#FFB020';
+const grid = Array.from({ length: 36 }, (_, i) => ({ x: 212 + (i % 6) * 16, y: 46 + Math.floor(i / 6) * 16, on: [2, 7, 9, 14, 19, 22, 27, 33].includes(i) }));
+const cal = Array.from({ length: 28 }, (_, i) => ({ x: 176 + (i % 7) * 18, y: 64 + Math.floor(i / 7) * 18, on: i === 16 }));
+const bars = [34, 52, 28, 64, 44, 72, 58];
+---
+
+<svg viewBox="0 0 320 200" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="square">
+  {
+    kind === 'intake' && (
+      <>
+        <rect x="18" y="44" width="92" height="24" />
+        <rect x="18" y="84" width="72" height="24" />
+        <rect x="18" y="124" width="86" height="24" />
+        <path d="M110 56 C 140 56, 140 96, 168 96 M90 96 H168 M104 136 C 140 136, 140 96, 168 96" />
+        <rect x="167" y="85" width="22" height="22" transform="rotate(45 178 96)" fill={amber} stroke="none" />
+        {grid.map((g) => <rect x={g.x} y={g.y} width="11" height="11" fill={g.on ? cobalt : 'none'} stroke={g.on ? 'none' : 'currentColor'} stroke-width="1" />)}
+      </>
+    )
+  }
+  {
+    kind === 'motion' && (
+      <>
+        <path d="M30 24 V150 H230" stroke-width="1" />
+        <path d="M40 140 C 120 140, 140 34, 220 34" stroke={amber} stroke-width="5" />
+        <path d="M40 140 H110 M220 34 H150" stroke-width="1" />
+        <circle cx="110" cy="140" r="4" fill="currentColor" stroke="none" />
+        <circle cx="150" cy="34" r="4" fill="currentColor" stroke="none" />
+        <path d="M30 176 H290" stroke-width="1" />
+        {[40, 120, 220, 270].map((x, i) => <rect x={x - 6} y="170" width="12" height="12" transform={`rotate(45 ${x} 176)`} fill={i % 2 ? cobalt : amber} stroke="none" />)}
+        <rect x="250" y="40" width="44" height="44" />
+        <rect x="262" y="52" width="20" height="20" fill={cobalt} stroke="none" />
+      </>
+    )
+  }
+  {
+    kind === 'lottie' && (
+      <>
+        <path d="M40 150 C 70 40, 110 40, 140 150" stroke-dasharray="4 6" stroke-width="1" />
+        <circle cx="90" cy="68" r="20" fill={cobalt} stroke="none" />
+        <path d="M160 150 C 190 70, 230 70, 260 150" stroke-dasharray="4 6" stroke-width="1" />
+        <rect x="196" y="72" width="30" height="30" transform="rotate(20 211 87)" />
+        <path d="M120 176 L140 140 L160 176 Z" fill={amber} stroke="none" />
+        <path d="M24 176 H296" stroke-width="1" />
+      </>
+    )
+  }
+  {
+    kind === 'chat' && (
+      <>
+        <rect x="20" y="28" width="150" height="34" />
+        <path d="M32 40 H140 M32 50 H110" stroke-width="1" />
+        <rect x="120" y="76" width="150" height="34" fill={cobalt} stroke="none" />
+        <path d="M132 88 H250 M132 98 H220" stroke="#F3F3EE" stroke-width="1" />
+        <rect x="20" y="124" width="120" height="34" />
+        <path d="M32 136 H120 M32 146 H96" stroke-width="1" />
+        <path d="M232 168 V140 L256 122 L280 140 V168 Z M248 168 V152 H264 V168" />
+        <rect x="160" y="168" width="64" height="16" fill={amber} stroke="none" />
+      </>
+    )
+  }
+  {
+    kind === 'voice' && (
+      <>
+        {Array.from({ length: 16 }, (_, i) => <path d={`M${24 + i * 8} ${100 - (8 + ((i * 37) % 30))} V${100 + (8 + ((i * 37) % 30))}`} stroke={amber} stroke-width="4" />)}
+        {cal.map((c) => <rect x={c.x} y={c.y} width="14" height="14" fill={c.on ? cobalt : 'none'} stroke={c.on ? 'none' : 'currentColor'} stroke-width="1" />)}
+        <path d="M176 50 H300" stroke-width="1" />
+        <path d="M290 150 l6 6 l12 -14" stroke-width="2" />
+      </>
+    )
+  }
+  {
+    kind === 'report' && (
+      <>
+        <rect x="70" y="24" width="180" height="110" />
+        <rect x="52" y="44" width="180" height="110" fill="#F4F4F0" />
+        <rect x="34" y="64" width="180" height="110" fill="#F4F4F0" />
+        {bars.map((h, i) => <rect x={50 + i * 22} y={164 - h} width="12" height={h} fill={i === 5 ? amber : cobalt} stroke="none" />)}
+        <path d="M46 80 H120" stroke-width="1" />
+      </>
+    )
+  }
+  {
+    kind === 'dashboard' && (
+      <>
+        <rect x="16" y="18" width="288" height="164" />
+        <path d="M16 36 H304 M76 36 V182" stroke-width="1" />
+        <path d="M28 52 H62 M28 64 H54 M28 76 H58" stroke-width="1" />
+        {[0, 1, 2].map((i) => <rect x={90 + i * 70} y="50" width="58" height="34" fill={i === 1 ? cobalt : 'none'} stroke={i === 1 ? 'none' : 'currentColor'} stroke-width="1" />)}
+        <path d="M90 160 L120 140 L150 148 L180 116 L210 126 L240 100 L284 108" stroke={amber} stroke-width="3" />
+        <path d="M90 168 H290" stroke-width="1" />
+      </>
+    )
+  }
+</svg>

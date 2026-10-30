@@ -12,7 +12,7 @@ const d = t(Astro.props.lang);
   </div>
   <p class="hud-meter mono"><span class="ltr" data-meter>000</span>% · {d.ui.progress}</p>
   <div class="rail" data-rail>
-    <ol>{d.chapters.map((_, i) => <li class="mono ltr">{String(6 - i).padStart(2, '0')}</li>)}</ol>
+    <ol>{d.chapters.map((_, i) => <li class="mono ltr">{String(d.chapters.length - 1 - i).padStart(2, '0')}</li>)}</ol>
     <span class="rail-mark" data-rail-mark><span class="key"></span></span>
   </div>
 </aside>

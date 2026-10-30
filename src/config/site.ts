@@ -7,7 +7,7 @@ export const site = {
   // International format, digits only after the plus sign.
   whatsapp: '+963985632774',
   // Paste your full LinkedIn profile URL here; the LinkedIn button stays hidden while it is empty.
-  linkedin: '',
+  linkedin: 'https://www.linkedin.com/in/omarsarsar/',
   iconscout: 'https://iconscout.com/contributors/osamasarsar',
   orpetron: 'https://orpetron.agency',
 };

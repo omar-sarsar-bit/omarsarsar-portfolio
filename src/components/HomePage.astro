@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Chapter from './Chapter.astro';
 import AgentChat from './AgentChat.astro';
+import WorkIndex from './WorkIndex.astro';
 import Roll from './Roll.astro';
 import { site, whatsappLink, emailLink } from '../config/site';
 import { personSchema, serviceSchema, faqSchema } from '../lib/schema';
@@ -10,7 +11,6 @@ import { t, localePath, otherLang, type Lang } from '../i18n';
 interface Props { lang: Lang }
 const { lang } = Astro.props;
 const d = t(lang);
-const caseHref = localePath(lang, '/work/multilingual-ai-intake/');
 const name = lang === 'ar' ? site.nameAr : site.name;
 const pad = (n: number) => String(n).padStart(2, '0');
 ---
@@ -24,7 +24,10 @@ const pad = (n: number) => String(n).padStart(2, '0');
     <div class="start-top grid">
       <p class="start-story" data-fade>{d.hero.story}</p>
     </div>
-    <p class="start-cue mono" aria-hidden="true"><span class="cue-arrow">↑</span><span>{d.ui.cue}</span><span class="cue-hint">{d.ui.clickHint}</span></p>
+    <div class="start-cue">
+      <p class="motto display">{d.hero.motto}</p>
+      <p class="mono cue-line" aria-hidden="true"><span class="cue-arrow">↑</span><span>{d.ui.cue}</span><span class="cue-hint">{d.ui.clickHint}</span></p>
+    </div>
     <h1 id="start-h" class="start-title display" data-title>
       {d.hero.title.map((l) => <span class="line">{l}</span>)}
     </h1>
@@ -32,7 +35,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
       <a class="act" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}>
         <Roll text={d.hero.primary} /><span class="arr" aria-hidden="true">↑</span>
       </a>
-      <a class="ul" href={caseHref} data-cursor-text={d.ui.cursorOpen}>{d.hero.secondary}</a>
+      <a class="ul" href="#work" data-goto="work" data-cursor-text={d.ui.cursorOpen}>{d.hero.secondary}</a>
       <p class="start-id mono">{name} · {d.meta.role}</p>
     </div>
   </section>
@@ -71,12 +74,11 @@ const pad = (n: number) => String(n).padStart(2, '0');
         <ul class="rows points">
           {d.route.points.map((p, i) => <li><span class="mono ltr">{String.fromCharCode(97 + i)}</span>{p}</li>)}
         </ul>
-        <a class="act" href={caseHref} data-cursor-text={d.ui.cursorOpen}><Roll text={d.route.caseLink} /><span class="arr" aria-hidden="true">↗</span></a>
       </div>
       <div class="r-big">
         <p class="r-num display ltr" data-stretch>{d.route.number}</p>
         <p class="mono r-cap">{d.route.numberCaption}</p>
-        <div class="anchor a2" data-anchor="2" aria-hidden="true"><div class="r-tiles" data-tiles>{Array.from({ length: 43 }, () => <i />)}</div></div>
+        <div class="anchor a2" data-anchor="2" aria-hidden="true"><div class="r-tiles" data-tiles>{Array.from({ length: 42 }, () => <i />)}</div></div>
       </div>
     </div>
   </Chapter>
@@ -144,8 +146,15 @@ const pad = (n: number) => String(n).padStart(2, '0');
     </div>
   </Chapter>
 
-  <!-- 05 · Human -->
-  <Chapter lang={lang} id="human" index={5} tone="ink" node={d.human.node}>
+  <!-- 05 · Work -->
+  <Chapter lang={lang} id="work" index={5} tone="ink" node={d.work.node} service={d.work.service}>
+    <h2 id="work-h" class="ch-title display" data-title>{d.work.title.map((l) => <span class="line">{l}</span>)}</h2>
+    <div class="grid"><p class="lead w-lead" data-fade>{d.work.body}</p></div>
+    <WorkIndex lang={lang} />
+  </Chapter>
+
+  <!-- 06 · Human -->
+  <Chapter lang={lang} id="human" index={6} tone="paper" node={d.human.node}>
     <div class="title-row grid"><h2 id="human-h" class="ch-title display" data-title>{d.human.title.map((l) => <span class="line">{l}</span>)}</h2><div class="anchor" data-anchor="5" aria-hidden="true"></div></div>
     <div class="grid">
       <p class="h-story" data-lit>{d.human.story}</p>
@@ -168,8 +177,8 @@ const pad = (n: number) => String(n).padStart(2, '0');
     </div>
   </Chapter>
 
-  <!-- 06 · Output -->
-  <Chapter lang={lang} id="output" index={6} tone="cobalt" node={d.output.node} class="ch-output">
+  <!-- 07 · Output -->
+  <Chapter lang={lang} id="output" index={7} tone="cobalt" node={d.output.node} class="ch-output">
     <div class="faq">
       <h3 class="mono label pad">{d.output.faqTitle}</h3>
       <div class="faq-list">
@@ -208,7 +217,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
             site.linkedin && (
               <li>
                 <span class="mono">{d.output.linkedin}</span>
-                <a class="ul" href={site.linkedin} target="_blank" rel="noopener">linkedin.com</a>
+                <a class="ul ltr" href={site.linkedin} target="_blank" rel="noopener">linkedin.com/in/omarsarsar</a>
                 <span />
               </li>
             )
@@ -230,6 +239,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
       <div class="outro-meta grid mono">
         <span>{d.ui.localTime} · UTC+3 · <span class="ltr" data-clock>--:--</span></span>
         <a href="#start" class="ul" data-goto="start">{d.ui.backToStart} ↓</a>
+        <a class="ul" href={site.linkedin} target="_blank" rel="noopener">LinkedIn ↗</a>
         <a class="ul" href={localePath(otherLang(lang), '/')} hreflang={otherLang(lang)} lang={otherLang(lang)}>{d.ui.switchTo}</a>
         <span>© {new Date().getFullYear()} {name}. {d.ui.rights}</span>
       </div>
@@ -268,7 +278,9 @@ const pad = (n: number) => String(n).padStart(2, '0');
   .anchor { pointer-events: none; }
   .a0 { position: absolute; inset-inline-end: var(--pad); top: 17%; width: 48%; height: 38%; }
   .start-story { grid-column: 9 / span 4; font-size: clamp(1rem, 0.5vw + 0.85rem, 1.25rem); line-height: 1.45; }
-  .start-cue { align-self: center; justify-self: start; margin-inline-start: var(--pad); display: flex; flex-direction: column; align-items: flex-start; gap: 10px; color: var(--muted); }
+  .start-cue { align-self: center; justify-self: start; margin-inline-start: var(--pad); display: grid; gap: 14px; max-width: 30rem; }
+  .motto { font-size: clamp(1.3rem, 2.1vw, 2.2rem); line-height: 0.98; font-stretch: 112%; font-weight: 700; }
+  .cue-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--muted); }
   .cue-hint { color: var(--muted); }
   .cue-arrow { font-size: 1.4rem; animation: rise 1.8s var(--ease) infinite; }
   @keyframes rise { 0% { transform: translateY(10px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-14px); opacity: 0; } }
@@ -385,16 +397,18 @@ const pad = (n: number) => String(n).padStart(2, '0');
   .marquee-track .key { width: 0.28em; height: 0.28em; }
   .outro { display: grid; gap: 2vh; padding-top: 72px; }
   .outro-meta { color: var(--muted); row-gap: 10px; }
-  .outro-meta > :nth-child(1) { grid-column: 1 / span 4; }
-  .outro-meta > :nth-child(2) { grid-column: 5 / span 3; justify-self: start; }
+  .outro-meta > :nth-child(1) { grid-column: 1 / span 3; }
+  .outro-meta > :nth-child(2) { grid-column: 4 / span 4; justify-self: start; }
   .outro-meta > :nth-child(3) { grid-column: 8 / span 1; }
-  .outro-meta > :nth-child(4) { grid-column: 9 / span 4; justify-self: end; }
+  .outro-meta > :nth-child(4) { grid-column: 9 / span 1; }
+  .outro-meta > :nth-child(5) { grid-column: 10 / span 3; justify-self: end; }
+  .w-lead { grid-column: 1 / span 6; }
   .outro-name { display: inline-block; font-size: 10vw; line-height: 0.82; font-weight: 900; font-stretch: 150%; white-space: nowrap; margin-inline: var(--pad); }
   :lang(ar) .outro-name { font-size: 15vw; line-height: 1.1; }
 
   @media (max-width: 900px) {
     .start-id { grid-column: 1 / -1; justify-self: start; text-align: start; }
-    .a0 { top: 27%; width: 92%; height: 17%; }
+    .a0 { top: 23%; width: 92%; height: 8%; }
     .title-row .ch-title { grid-column: 1 / -1; }
     .title-row .anchor, .a3, .a4 { grid-column: 1 / -1; min-height: 11rem; }
     .start-story { grid-column: 1 / -1; grid-row: 2; margin-top: 12px; }

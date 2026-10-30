@@ -8,7 +8,7 @@ import { t, localePath, otherLang, type Lang } from '../i18n';
 interface Props { lang: Lang; route?: string }
 const { lang, route } = Astro.props;
 const d = t(lang);
-export const chapterIds = ['start', 'understand', 'route', 'report', 'interface', 'human', 'output'];
+export const chapterIds = ['start', 'understand', 'route', 'report', 'interface', 'work', 'human', 'output'];
 const home = localePath(lang, '/');
 const onHome = route === '/';
 const href = (id: string) => (onHome ? `#${id}` : `${home}#${id}`);

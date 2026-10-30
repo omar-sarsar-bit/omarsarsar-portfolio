@@ -1,5 +1,5 @@
 // The 3D layer of the ascent, loaded after first paint. Flat fills and ink edges, like a technical
-// drawing: message slips at ground level, an amber core, 43 program cubes, stacked reports,
+// drawing: message slips at ground level, an amber core, 42 destination cubes, stacked reports,
 // interface frames, an easing curve and the autopilot ring. Each object is pinned to an empty
 // "anchor" box in the layout, so it travels with the page and never sits on top of body text.
 
@@ -10,6 +10,7 @@ import { flowMessages } from '../i18n/demo-scripts';
 // Nominal height in world units of each chapter's object, used to fit it into its anchor.
 const NOMINAL = [3.9, 5.4, 4.6, 4.4, 3.6, 3.8, 6.2];
 const FOV = 30;
+const CUBES = 42;
 const DIST = 16;
 const TONES = {
   paper: { line: new THREE.Color('#0D0D10'), accent: new THREE.Color('#1F33D1') },
@@ -129,26 +130,26 @@ export async function startScene(canvas: HTMLCanvasElement): Promise<boolean> {
   }
   levels[1].add(orbit);
 
-  /* ---------- 02 · 43 program cubes ---------- */
+  /* ---------- 02 · 42 destination cubes (teams, tools, people) ---------- */
   const cubesGroup = new THREE.Group();
   cubesGroup.rotation.set(-0.4, side * -0.5, 0);
   const box = new THREE.BoxGeometry(0.42, 0.42, 0.42);
   const boxEdges = new THREE.EdgesGeometry(box);
-  const cubeFill = new THREE.InstancedMesh(box, accentMat, 43);
+  const cubeFill = new THREE.InstancedMesh(box, accentMat, CUBES);
   const cubePos: THREE.Vector3[] = [];
   const edgePositions: number[] = [];
   const be = boxEdges.attributes.position.array as ArrayLike<number>;
-  for (let i = 0; i < 43; i++) {
+  for (let i = 0; i < CUBES; i++) {
     const c = i % 7;
     const r = Math.floor(i / 7);
-    const p = new THREE.Vector3((c - 3) * 0.62, (3 - r) * 0.62, 0);
+    const p = new THREE.Vector3((c - 3) * 0.62, (2.5 - r) * 0.62, 0);
     cubePos.push(p);
     for (let k = 0; k < be.length; k += 3) edgePositions.push(be[k] + p.x, be[k + 1] + p.y, be[k + 2] + p.z);
   }
   const cubeEdgeGeo = new THREE.BufferGeometry();
   cubeEdgeGeo.setAttribute('position', new THREE.Float32BufferAttribute(edgePositions, 3));
   cubesGroup.add(new THREE.LineSegments(cubeEdgeGeo, lineMat), cubeFill);
-  const cubeScale = new Array(43).fill(0);
+  const cubeScale = new Array(CUBES).fill(0);
   const m4 = new THREE.Matrix4();
   levels[2].add(cubesGroup);
 
@@ -242,8 +243,8 @@ export async function startScene(canvas: HTMLCanvasElement): Promise<boolean> {
   inner.rotation.x = 1.15;
   const tiny = new THREE.BoxGeometry(0.14, 0.14, 0.14);
   const tinyEdges = new THREE.EdgesGeometry(tiny);
-  for (let i = 0; i < 43; i++) {
-    const a = (i / 43) * Math.PI * 2;
+  for (let i = 0; i < 36; i++) {
+    const a = (i / 36) * Math.PI * 2;
     const o = new THREE.LineSegments(tinyEdges, lineMat);
     o.position.set(Math.cos(a) * 1.6, Math.sin(a) * 1.6, 0);
     inner.add(o);
@@ -358,8 +359,8 @@ export async function startScene(canvas: HTMLCanvasElement): Promise<boolean> {
     orbit.rotation.z = t * 0.4;
 
     // 02: cubes fill one by one with the chapter.
-    const lit = Math.round(clamp((state.chapterProgress[2] - 0.25) / 0.45) * 43);
-    for (let i = 0; i < 43; i++) {
+    const lit = Math.round(clamp((state.chapterProgress[2] - 0.25) / 0.45) * CUBES);
+    for (let i = 0; i < CUBES; i++) {
       cubeScale[i] += ((i < lit ? 1 : 0) - cubeScale[i]) * 0.15;
       const sc = Math.max(0.0001, cubeScale[i]);
       m4.makeScale(sc, sc, sc).setPosition(cubePos[i]);
@@ -386,7 +387,7 @@ export async function startScene(canvas: HTMLCanvasElement): Promise<boolean> {
     });
 
     // 05: the curve draws itself.
-    const p5 = ease((state.chapterProgress[5] - 0.2) / 0.45);
+    const p5 = ease((state.chapterProgress[6] - 0.2) / 0.45);
     tubeGeo.setDrawRange(0, Math.floor((tubeIndexCount * p5) / 3) * 3);
     curveGroup.rotation.y = state.pointer.x * 0.25 * side;
 
