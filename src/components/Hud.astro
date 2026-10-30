@@ -1,42 +1,41 @@
 ---
-// Execution log in the corner: one line is appended each time a chapter "executes".
+// The floor indicator in the top corner, and the slot the tower docks into while you climb.
 import { t, type Lang } from '../i18n';
 
 interface Props { lang: Lang }
 const d = t(Astro.props.lang);
+const last = String(d.chapters.length - 1).padStart(2, '0');
 ---
 
-<aside class="hud" aria-hidden="true" data-log-names={JSON.stringify(d.log)}>
-  <div class="hud-log mono ltr" data-log>
-    <p class="run"><span class="key"></span> {d.ui.run} #<span data-run>0427</span> · {d.log[0]}</p>
-  </div>
-  <p class="hud-meter mono"><span class="ltr" data-meter>000</span>% · {d.ui.progress}</p>
-  <div class="rail" data-rail>
-    <ol>{d.chapters.map((_, i) => <li class="mono ltr">{String(d.chapters.length - 1 - i).padStart(2, '0')}</li>)}</ol>
-    <span class="rail-mark" data-rail-mark><span class="key"></span></span>
-  </div>
+<aside class="hud" aria-hidden="true">
+  <p class="hud-floor mono">
+    <span class="key"></span>
+    <span>{d.ui.floor}</span>
+    <span class="ltr"><span data-floor>00</span>/{last}</span>
+    <span class="hud-sep">·</span>
+    <span data-floor-name>{d.chapters[0]}</span>
+  </p>
 </aside>
+<div class="tower-mini" data-tower-slot="mini" aria-hidden="true"></div>
 
 <style>
   .hud {
-    position: fixed; top: 0; inset-inline: 0; z-index: 90; pointer-events: none;
-    display: flex; justify-content: space-between; align-items: flex-start;
-    padding: calc(14px + env(safe-area-inset-top, 0px)) var(--pad) 0;
-    color: var(--muted); transition: color 0.8s var(--ease);
+    position: fixed; top: calc(14px + env(safe-area-inset-top, 0px)); inset-inline-start: var(--pad); z-index: 90;
+    pointer-events: none;
   }
-  :global(html:not(.ascent)) .hud { display: none; }
-  .hud-log { display: grid; gap: 2px; text-align: left; }
-  .hud-log :global(p) { display: flex; gap: 8px; align-items: center; white-space: nowrap; }
-  .hud-log :global(.ok) { color: var(--accent); }
-  .hud-log :global(.ms) { opacity: 0.6; }
-  .run .key { width: 6px; height: 6px; }
-  .rail { position: fixed; inset-inline-end: 10px; top: 22vh; bottom: calc(var(--dock) + 10vh); width: 22px; border-inline-end: 1px solid var(--rule); }
-  .rail ol { position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; padding-inline-end: 8px; }
-  .rail li { font-size: 0.56rem; opacity: 0.7; }
-  .rail-mark { position: absolute; inset-inline-end: -5px; bottom: 0; transform: translateY(50%); }
-  .rail-mark .key { width: 9px; height: 9px; }
-  @media (max-width: 860px) {
-    .hud-log :global(p:not(:last-child)) { display: none; }
-    .rail { display: none; }
+  :global(html:not(.ascent)) .hud, :global(html:not(.ascent)) .tower-mini { display: none; }
+  .hud-floor {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 12px 7px 10px; background: var(--bg); color: var(--fg);
+    border: 1px solid var(--rule); transition: background-color 0.8s var(--ease), color 0.8s var(--ease);
   }
+  .hud-floor .key { width: 7px; height: 7px; }
+  .hud-sep { opacity: 0.5; }
+  [data-floor-name] { color: var(--muted); }
+  .tower-mini {
+    position: fixed; z-index: 0; pointer-events: none;
+    inset-inline-end: calc(var(--pad) * 0.4); top: 13vh; bottom: calc(var(--dock) + 7vh);
+    width: var(--tower-w);
+  }
+  @media (max-width: 1099px) { .tower-mini { display: none; } }
 </style>

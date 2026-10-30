@@ -1,0 +1,58 @@
+---
+// Live inventory: stock bars with their minimum marked. As the chapter climbs, paper cups sell down
+// past the minimum, the row turns amber and the purchase order appears. Static: the final state.
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const tb = t(Astro.props.lang).backoffice.table;
+const fmt = (n: number) => n.toLocaleString('en-US');
+---
+
+<div class="panel inv" data-inv>
+  <p class="panel-head mono"><span>{tb.title}</span><span class="pulse" aria-hidden="true"></span></p>
+  <div class="inv-cols mono" aria-hidden="true">
+    <span>{tb.cols[0]}</span><span>{tb.cols[1]}</span><span>{tb.cols[2]}</span>
+  </div>
+  <ol>
+    {
+      tb.rows.map((r) => {
+        const max = Math.max(r.from, r.min) * 1.15;
+        return (
+          <li class:list={['inv-row', r.stock < r.min && 'is-low']} data-invrow data-from={r.from} data-stock={r.stock} data-min={r.min} data-max={max}>
+            <span class="inv-item">{r.item}</span>
+            <span class="inv-num ltr" data-num>{fmt(r.stock)}</span>
+            <span class="inv-min mono ltr">{fmt(r.min)}</span>
+            <span class="inv-bar" aria-hidden="true">
+              <i data-fill style={`--v:${(r.stock / max).toFixed(3)}`} />
+              <b style={`--m:${(r.min / max).toFixed(3)}`} />
+            </span>
+          </li>
+        );
+      })
+    }
+  </ol>
+  <p class="inv-alert" data-alert><span class="key" aria-hidden="true"></span><span>{tb.alert}</span></p>
+  <p class="inv-matched mono"><span>{tb.matched}</span><span class="ltr"><span data-matched>{tb.matchedValue}</span>/{tb.matchedValue}</span></p>
+</div>
+
+<style>
+  .inv-cols, .inv-row { display: grid; grid-template-columns: 1fr 5.5rem 5.5rem; gap: var(--gap); align-items: baseline; }
+  .inv-cols { color: var(--muted); padding: 10px 0; }
+  .inv-cols span:not(:first-child), .inv-num, .inv-min { text-align: end; }
+  .inv-row { padding: 12px 0 14px; border-top: 1px solid var(--rule); row-gap: 10px; transition: color 0.4s; }
+  .inv-item { font-weight: 500; }
+  .inv-num { font-family: var(--display); font-weight: 700; font-size: 1.25rem; font-variant-numeric: tabular-nums; }
+  :lang(ar) .inv-num { font-family: var(--mono); font-size: 1.05rem; }
+  .inv-min { color: var(--muted); }
+  .inv-bar { grid-column: 1 / -1; position: relative; height: 6px; background: var(--rule); }
+  .inv-bar i { position: absolute; inset-block: 0; inset-inline-start: 0; width: calc(var(--v) * 100%); background: var(--fg); transition: background-color 0.4s; }
+  .inv-bar b { position: absolute; top: -5px; bottom: -5px; inset-inline-start: calc(var(--m) * 100%); width: 2px; background: var(--accent); }
+  .inv-row.is-low { color: var(--fg); }
+  .inv-row.is-low .inv-num { color: var(--alert); }
+  .inv-row.is-low .inv-bar i { background: var(--amber); }
+  .inv-alert { display: flex; gap: 12px; align-items: baseline; margin-top: 4px; padding: 14px 16px; border: 1px solid var(--amber); line-height: 1.45; transition: opacity 0.5s var(--ease), transform 0.5s var(--ease); }
+  .inv-alert .key { transform: rotate(45deg) translateY(-2px); }
+  :global(.ascent-live) .inv-alert:not(.is-on) { opacity: 0; transform: translateY(-8px); }
+  .inv-matched { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); padding-top: 14px; }
+  [data-matched] { color: var(--fg); }
+</style>

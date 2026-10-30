@@ -3,12 +3,12 @@
 import LogoMark from './LogoMark.astro';
 import Roll from './Roll.astro';
 import { site, whatsappLink } from '../config/site';
+import { chapterIds } from '../config/chapters';
 import { t, localePath, otherLang, type Lang } from '../i18n';
 
 interface Props { lang: Lang; route?: string }
 const { lang, route } = Astro.props;
 const d = t(lang);
-export const chapterIds = ['start', 'understand', 'route', 'report', 'interface', 'work', 'human', 'output'];
 const home = localePath(lang, '/');
 const onHome = route === '/';
 const href = (id: string) => (onHome ? `#${id}` : `${home}#${id}`);
@@ -37,11 +37,11 @@ const name = lang === 'ar' ? site.nameAr : site.name;
     }
   </ol>
 
-  <p class="dock-now mono" aria-hidden="true"><span data-now-index>00</span> <span data-now-name>{d.chapters[0]}</span></p>
+  {onHome && <p class="dock-now mono" aria-hidden="true"><span class="ltr" data-now-index>00</span> <span data-now-name>{d.chapters[0]}</span></p>}
 
   <div class="dock-end">
     <a class="dock-lang mono" href={switchHref} hreflang={otherLang(lang)} lang={otherLang(lang)} aria-label={`${d.ui.switchTo} · ${d.ui.switchLabel}`}>{d.ui.switchTo}</a>
-    <a class="act dock-cta" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}>
+    <a class="act solid dock-cta" href={whatsappLink(d.contact.waMessage)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}>
       <Roll text={d.ui.start} /><span class="arr" aria-hidden="true">↑</span>
     </a>
     <button class="dock-menu mono" type="button" aria-expanded="false" aria-controls="dock-sheet" data-sheet-toggle data-open={d.ui.index} data-close={d.ui.close}>{d.ui.index}</button>
@@ -60,7 +60,7 @@ const name = lang === 'ar' ? site.nameAr : site.name;
         ))
       }
     </ol>
-    <a class="act" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener"><Roll text={d.ui.start} /><span class="arr" aria-hidden="true">↑</span></a>
+    <a class="act" href={whatsappLink(d.contact.waMessage)} target="_blank" rel="noopener"><Roll text={d.ui.start} /><span class="arr" aria-hidden="true">↑</span></a>
   </div>
 </nav>
 
@@ -76,7 +76,7 @@ const name = lang === 'ar' ? site.nameAr : site.name;
   }
   .dock-progress { position: absolute; inset-inline: 0; top: -1px; height: 1px; overflow: hidden; }
   .dock-progress i { display: block; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
-  [dir='rtl'] .dock-progress i { transform-origin: right; }
+  :global([dir='rtl']) .dock-progress i { transform-origin: right; }
   .dock-brand { display: flex; align-items: center; gap: 10px; flex: none; color: var(--fg); }
   .dock-brand :global(svg) { --mark-bg: var(--fg); --mark-fg: var(--bg); }
   .dock-name { font-family: var(--display); font-weight: 700; font-stretch: 112%; font-size: 0.9rem; text-transform: uppercase; letter-spacing: 0.01em; }
@@ -91,6 +91,7 @@ const name = lang === 'ar' ? site.nameAr : site.name;
   .dock-end { display: flex; align-items: center; gap: 14px; flex: none; }
   .dock-lang { padding: 8px 6px; font-size: 0.78rem; }
   .dock-lang:lang(ar) { font-family: var(--arabic); font-size: 0.95rem; text-transform: none; }
+  .dock-lang:lang(en) { font-family: var(--mono); }
   .dock-cta { padding: 0.8em 1.1em; }
   .dock-menu { display: none; padding: 10px 0; }
   .dock-sheet {
@@ -103,7 +104,7 @@ const name = lang === 'ar' ? site.nameAr : site.name;
   .dock-sheet li a { display: flex; align-items: baseline; gap: 16px; padding: 10px 0; border-top: 1px solid var(--rule); }
   .dock-sheet .display { font-size: clamp(1.8rem, 8vw, 2.6rem); }
 
-  @media (max-width: 1180px) {
+  @media (max-width: 1440px) {
     .dock-index .nm { display: none; }
     .dock-index a.is-active .nm { display: inline; }
   }

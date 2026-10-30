@@ -15,7 +15,7 @@ export function personSchema(lang: Lang) {
     url: new URL(localePath(lang, '/'), site.url).href,
     image: new URL('/apple-touch-icon.png', site.url).href,
     knowsLanguage: ['ar', 'en'],
-    knowsAbout: ['AI automation', 'n8n', 'AI agents', 'Chatbots', 'Web applications', 'SaaS', 'Motion design', 'Lottie'],
+    knowsAbout: ['AI automation', 'AI receptionists', 'AI assistants', 'n8n', 'AI agents', 'Chatbots', 'Inventory automation', 'Automated reporting', 'Web applications', 'SaaS', 'Motion design', 'Lottie'],
     sameAs: [site.iconscout, site.linkedin].filter(Boolean),
   };
 }
@@ -36,9 +36,9 @@ export function serviceSchema(lang: Lang) {
     hasOfferCatalog: {
       '@type': 'OfferCatalog',
       name: d.meta.role,
-      itemListElement: [d.understand, d.route, d.report, d.interface].map((s) => ({
+      itemListElement: [d.frontdesk, d.intake, d.assistant, d.backoffice, d.reports, d.apps].map((s) => ({
         '@type': 'Offer',
-        itemOffered: { '@type': 'Service', name: s.service, description: s.body },
+        itemOffered: { '@type': 'Service', name: s.kicker, description: s.body },
       })),
     },
   };
@@ -49,7 +49,7 @@ export function faqSchema(lang: Lang) {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    mainEntity: d.output.faq.map((f) => ({
+    mainEntity: d.contact.faq.map((f) => ({
       '@type': 'Question',
       name: f.q,
       acceptedAnswer: { '@type': 'Answer', text: f.a },

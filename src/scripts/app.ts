@@ -118,6 +118,11 @@ function clock() {
   setInterval(tick, 15000);
 }
 
+// Fonts in (or a second passed): the ascent can paint without anything reflowing in view.
+Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise((r) => setTimeout(r, 1000))]).then(() =>
+  root.classList.add('fonts-ready'),
+);
+
 cursor();
 dockSheet();
 copyButtons();

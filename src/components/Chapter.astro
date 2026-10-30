@@ -1,6 +1,6 @@
 ---
-// One chapter of the ascent. The title block (index, name, service, node) sits like the
-// title block of a technical drawing; the outlined numeral marks the real sequence.
+// One floor of the ascent. A hairline title block opens each chapter: floor number, name and the
+// job it covers. Content reads top to bottom; only the chapters themselves are stacked upwards.
 import { t, type Lang } from '../i18n';
 
 interface Props {
@@ -8,23 +8,20 @@ interface Props {
   id: string;
   index: number;
   tone: 'paper' | 'cobalt' | 'ink';
-  node: string;
-  service?: string;
+  kicker?: string;
   class?: string;
 }
-const { lang, id, index, tone, node, service, class: className } = Astro.props;
+const { lang, id, index, tone, kicker, class: className } = Astro.props;
 const d = t(lang);
 const pad = String(index).padStart(2, '0');
 ---
 
 <section class:list={['ch', className]} id={id} data-ch={index} data-tone={tone} aria-labelledby={`${id}-h`}>
-  <span class="ch-num display ltr" aria-hidden="true" data-num>{pad}</span>
-  <div class="ch-inner stack">
-    <header class="ch-meta mono">
-      <span class="ltr">{pad}</span>
-      <span>{d.chapters[index]}</span>
-      {service && <span class="svc">{service}</span>}
-      <span class="node ltr">node: {node}</span>
+  <div class="ch-inner">
+    <header class="ch-meta">
+      <span class="mono"><span>{d.ui.floor}</span> <span class="ltr">{pad}</span></span>
+      <span class="ch-name">{d.chapters[index]}</span>
+      {kicker && <span class="mono ch-kicker">{kicker}</span>}
     </header>
     <slot />
   </div>
@@ -33,25 +30,20 @@ const pad = String(index).padStart(2, '0');
 <style>
   .ch {
     position: relative; min-height: 100svh;
-    padding: clamp(72px, 9vh, 120px) 0 calc(var(--dock) + clamp(28px, 5vh, 64px));
-    display: flex; flex-direction: column; justify-content: flex-end;
-    overflow: hidden;
+    padding-block: clamp(84px, 12vh, 136px) calc(var(--dock) + clamp(36px, 7vh, 84px));
+    padding-inline: 0 var(--tower-w);
+    display: flex; flex-direction: column; justify-content: center;
+    overflow-x: clip;
   }
-  .ch-inner { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(28px, 5vh, 56px); }
-  :global(.ascent) .ch-inner { flex-direction: column-reverse; }
+  .ch-inner { position: relative; z-index: 1; display: flex; flex-direction: column; gap: clamp(28px, 4.6vh, 52px); }
   .ch-meta {
-    display: grid; grid-template-columns: 3rem 1fr 2fr auto; gap: var(--gap); align-items: baseline;
-    margin-inline: var(--pad); padding-top: 10px; border-top: 1px solid var(--rule-strong); color: var(--muted);
+    display: flex; align-items: baseline; gap: 18px; flex-wrap: wrap;
+    margin-inline: var(--pad); padding-top: 12px; border-top: 1px solid var(--rule-strong);
   }
-  .ch-meta .node { justify-self: end; grid-column: -2 / -1; }
-  .ch-num {
-    position: absolute; z-index: 0; inset-inline-end: calc(var(--pad) * -0.4); bottom: calc(var(--dock) + 2vh);
-    font-size: clamp(9rem, 30vw, 30rem); line-height: 0.75; font-weight: 800; font-stretch: 60%;
-    color: transparent; -webkit-text-stroke: 1px var(--rule-strong);
-    pointer-events: none; user-select: none;
-  }
-  @media (max-width: 760px) {
-    .ch-meta { grid-template-columns: 2.4rem 1fr auto; }
-    .ch-meta .svc { display: none; }
+  .ch-meta > .mono:first-child { color: var(--accent); }
+  .ch-name { font-weight: 600; font-size: 0.92rem; }
+  .ch-kicker { margin-inline-start: auto; color: var(--muted); }
+  @media (max-width: 640px) {
+    .ch-kicker { margin-inline-start: 0; flex-basis: 100%; }
   }
 </style>

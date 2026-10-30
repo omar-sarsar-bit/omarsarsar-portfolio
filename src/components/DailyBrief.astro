@@ -1,0 +1,37 @@
+---
+// The morning brief the assistant sends: lines arrive one by one as the chapter climbs into view.
+import { t, type Lang } from '../i18n';
+
+interface Props { lang: Lang }
+const b = t(Astro.props.lang).assistant.brief;
+---
+
+<figure class="panel brief" data-brief>
+  <figcaption class="panel-head mono">
+    <span class="who"><span class="pulse" aria-hidden="true"></span>{b.from}</span>
+    <span class="ltr">{b.time}</span>
+  </figcaption>
+  <p class="brief-title">{b.title}</p>
+  <ol class="brief-items">
+    {
+      b.items.map((it, i) => (
+        <li data-bitem>
+          <span class="mono ltr">{String(i + 1).padStart(2, '0')}</span>
+          <span>{it}</span>
+        </li>
+      ))
+    }
+  </ol>
+  <p class="brief-foot mono" data-bitem>{b.foot}</p>
+</figure>
+
+<style>
+  .brief { display: grid; }
+  .who { display: inline-flex; align-items: center; gap: 10px; color: var(--fg); }
+  .brief-title { font-size: clamp(1.15rem, 1vw + 0.8rem, 1.6rem); font-weight: 600; line-height: 1.25; padding: 18px 0 8px; }
+  .brief-items li { display: grid; grid-template-columns: 2.2rem 1fr; gap: 12px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--rule); line-height: 1.45; }
+  .brief-items .mono { color: var(--accent); }
+  .brief-foot { color: var(--muted); padding-top: 14px; }
+  [data-bitem] { transition: opacity 0.6s var(--ease), transform 0.6s var(--ease); }
+  :global(.ascent-live) [data-bitem]:not(.is-in) { opacity: 0; transform: translateY(-10px); }
+</style>

@@ -1,0 +1,30 @@
+---
+// A flat drawing of the finished tower, shown when the 3D scene is off (reduced motion, no WebGL).
+const floors = 9;
+const w = 70; // half width of the footprint diamond
+const dd = 40; // half depth
+const fh = 30; // floor height
+const cx = 120;
+const base = 330;
+const levels = Array.from({ length: floors + 1 }, (_, i) => base - i * fh);
+const top = levels[floors];
+---
+
+<svg class="tower-fallback" viewBox="0 0 240 400" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true">
+  <path d={`M${cx - w - 20} ${base + 10} L${cx} ${base + dd + 22} L${cx + w + 20} ${base + 10} L${cx} ${base - dd - 2} Z`} stroke-opacity="0.35" />
+  {
+    levels.map((y, i) => (
+      <path d={`M${cx - w} ${y} L${cx} ${y + dd} L${cx + w} ${y}`} stroke-width={i === 0 ? 1.4 : 1} />
+    ))
+  }
+  <path d={`M${cx - w} ${base} V${top} M${cx} ${base + dd} V${top + dd} M${cx + w} ${base} V${top}`} />
+  <path d={`M${cx - w} ${top} L${cx} ${top - dd} L${cx + w} ${top}`} />
+  {[1, 4, 7].map((i) => <path d={`M${cx - w} ${levels[i]} L${cx} ${levels[i] + dd} L${cx} ${levels[i] + dd - fh} L${cx - w} ${levels[i] - fh} Z`} fill="var(--accent)" stroke="none" opacity="0.9" />)}
+  <path d={`M${cx} ${top - dd} V${top - dd - 26}`} />
+  <path d={`M${cx} ${top - dd - 52} L${cx + 13} ${top - dd - 36} L${cx} ${top - dd - 20} L${cx - 13} ${top - dd - 36} Z`} fill="#FFB020" stroke="none" />
+</svg>
+
+<style>
+  .tower-fallback { width: 100%; height: 100%; max-height: 70vh; margin-inline: auto; }
+  :global(.scene-on) .tower-fallback { visibility: hidden; }
+</style>

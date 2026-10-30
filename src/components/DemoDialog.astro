@@ -1,0 +1,99 @@
+---
+// The live-demo dialog. One <dialog> for every demo: the script fills it with the project, plays the
+// conversation, then shows the result the system produced. Sample data, labelled as such.
+import { t, type Lang } from '../i18n';
+import { workDemos } from '../i18n/demo-scripts';
+import { whatsappLink } from '../config/site';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const d = t(lang);
+const w = d.work;
+const data = {
+  labels: { user: d.demo.user, agent: d.demo.agent },
+  want: w.wantMessage,
+  wa: whatsappLink(''),
+  projects: Object.fromEntries(w.projects.filter((p) => p.demo).map((p) => [p.demo, { name: p.name, sector: p.sector, tags: p.tags }])),
+  demos: workDemos[lang],
+};
+---
+
+<dialog class="demo" data-demo-dialog aria-labelledby="demo-title" data-lenis-prevent>
+  <div class="demo-in">
+    <header class="demo-top">
+      <p class="mono demo-label"><span class="pulse" aria-hidden="true"></span>{w.dialog.label}</p>
+      <button type="button" class="demo-close" data-demo-close aria-label={w.dialog.close}><span aria-hidden="true">✕</span></button>
+    </header>
+    <div class="demo-body">
+      <h2 id="demo-title" class="display demo-title" data-demo-name></h2>
+      <p class="mono demo-sector" data-demo-sector></p>
+      <div class="demo-does">
+        <p class="mono demo-k">{w.dialog.does}</p>
+        <ul class="demo-points" data-demo-points></ul>
+      </div>
+      <div class="panel demo-chat">
+        <ol class="transcript" data-demo-thread aria-live="polite"></ol>
+      </div>
+      <div class="demo-out" data-demo-out hidden>
+        <p class="mono demo-k"><span class="key" aria-hidden="true"></span>{w.dialog.outcome}</p>
+        <p class="demo-out-title" data-demo-out-title></p>
+        <dl class="demo-out-rows" data-demo-out-rows></dl>
+      </div>
+    </div>
+    <footer class="demo-foot">
+      <button type="button" class="mono demo-replay" data-demo-replay><span aria-hidden="true">↻</span> {w.dialog.replay}</button>
+      <a class="act solid" href={data.wa} target="_blank" rel="noopener" data-demo-want><span>{w.dialog.want}</span><span class="arr" aria-hidden="true">↗</span></a>
+    </footer>
+  </div>
+  <script type="application/json" data-demo-data set:html={JSON.stringify(data)} />
+</dialog>
+
+<style>
+  .demo {
+    --bg: #F4F4F0; --fg: #0D0D10; --accent: #1F33D1; --alert: #8F4D00;
+    --muted: color-mix(in srgb, var(--fg) 66%, transparent);
+    --rule: color-mix(in srgb, var(--fg) 16%, transparent);
+    --rule-strong: color-mix(in srgb, var(--fg) 40%, transparent);
+    position: fixed; inset: 0 0 0 auto; margin: 0; max-width: none; max-height: none;
+    width: min(680px, 100vw); height: 100dvh; border: 0; border-inline-start: 1px solid var(--fg);
+    background: var(--bg); color: var(--fg); padding: 0; overflow: hidden;
+    color-scheme: light;
+  }
+  :global([dir='rtl']) .demo { inset: 0 auto 0 0; }
+  .demo::backdrop { background: color-mix(in srgb, #0D0D10 62%, transparent); }
+  .demo[open] { animation: demo-in 0.6s var(--ease); }
+  .demo[open]::backdrop { animation: fade 0.5s var(--ease); }
+  @keyframes demo-in { from { transform: translateX(var(--from, 100%)); } }
+  :global([dir='rtl']) .demo { --from: -100%; }
+  @keyframes fade { from { opacity: 0; } }
+  .demo-in { height: 100%; display: grid; grid-template-rows: auto 1fr auto; }
+  .demo-top, .demo-foot { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px clamp(18px, 4vw, 40px); }
+  .demo-top { border-bottom: 1px solid var(--rule); }
+  .demo-foot { border-top: 1px solid var(--rule); }
+  .demo-label { display: inline-flex; align-items: center; gap: 10px; color: var(--muted); }
+  .demo-close { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--rule-strong); font-size: 1rem; transition: background-color 0.3s, color 0.3s; }
+  .demo-close:hover, .demo-close:focus-visible { background: var(--fg); color: var(--bg); }
+  .demo-body { overflow-y: auto; overscroll-behavior: contain; padding: clamp(20px, 3vw, 36px) clamp(18px, 4vw, 40px) 40px; display: grid; gap: 26px; align-content: start; }
+  .demo-title { font-size: clamp(2rem, 4.4vw, 3.4rem); }
+  :lang(ar) .demo-title { font-size: clamp(1.9rem, 4vw, 3rem); }
+  .demo-sector { color: var(--muted); margin-top: -14px; }
+  .demo-k { display: flex; align-items: center; gap: 10px; color: var(--muted); margin-bottom: 10px; }
+  .demo-points { display: grid; }
+  .demo-points :global(li) { display: grid; grid-template-columns: 1.6rem 1fr; gap: 8px; padding: 10px 0; border-top: 1px solid var(--rule); line-height: 1.45; }
+  .demo-points :global(li:last-child) { border-bottom: 1px solid var(--rule); }
+  .demo-points :global(.n) { color: var(--accent); }
+  .demo-chat .transcript { min-height: 18rem; }
+  .demo-out { border: 1px solid var(--fg); padding: 18px 20px; display: grid; gap: 6px; }
+  .demo-out[hidden] { display: none; }
+  .demo-out-title { font-size: 1.3rem; font-weight: 700; line-height: 1.3; }
+  .demo-out-rows { display: grid; margin-top: 8px; }
+  .demo-out-rows :global(div) { display: grid; grid-template-columns: minmax(7rem, 0.4fr) 1fr; gap: 14px; padding: 9px 0; border-top: 1px solid var(--rule); }
+  .demo-out-rows :global(dt) { color: var(--muted); font-size: 0.9rem; }
+  .demo-out-rows :global(dd) { font-weight: 500; }
+  .demo-replay { color: var(--muted); padding: 10px 0; }
+  .demo-replay:hover { color: var(--fg); }
+  @media (max-width: 680px) {
+    .demo { border: 0; }
+    .demo-foot .act { padding-inline: 1em; }
+  }
+</style>

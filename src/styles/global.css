@@ -1,8 +1,8 @@
 /*
   Omar Sarsar · design system
-  Concept: "The Ascent". A technical drawing you climb. Paper, ink and cobalt fields, a 12-column
-  hairline grid, expanded display type whose width moves with the scroll, mono annotations.
-  Amber is reserved for execution states and keyframe diamonds.
+  Concept: "The Ascent". A business climbs floor by floor; each floor is one job handed to an AI teammate.
+  Paper, ink and cobalt fields, a 12-column hairline grid, expanded display type, mono annotations.
+  Amber is reserved for live states and keyframe diamonds.
 */
 :root {
   --paper: #EBEBE6;
@@ -17,6 +17,9 @@
   --muted: color-mix(in srgb, var(--fg) 66%, transparent);
   --rule: color-mix(in srgb, var(--fg) 18%, transparent);
   --rule-strong: color-mix(in srgb, var(--fg) 42%, transparent);
+  --panel: color-mix(in srgb, var(--fg) 4%, var(--bg));
+  /* Amber for text: darkened on paper so it still reads. */
+  --alert: #8F4D00;
 
   --display: 'Anybody Variable', 'Readex Pro Variable', 'Arial Narrow', sans-serif;
   --text: 'Schibsted Grotesk Variable', 'Helvetica Neue', Arial, sans-serif;
@@ -26,12 +29,17 @@
   --pad: clamp(18px, 3.4vw, 56px);
   --gap: clamp(12px, 1.6vw, 24px);
   --dock: 64px;
+  /* Width reserved at the inline end for the tower while it climbs beside the chapters. */
+  --tower-w: 0px;
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-io: cubic-bezier(0.76, 0, 0.24, 1);
   color-scheme: light;
 }
-:root[data-tone='cobalt'] { --bg: var(--cobalt); --fg: #F3F3EE; --accent: var(--amber); color-scheme: dark; }
-:root[data-tone='ink'] { --bg: var(--ink); --fg: #EBEBE6; --accent: var(--amber); color-scheme: dark; }
+:root[data-tone='cobalt'] { --bg: var(--cobalt); --fg: #F3F3EE; --accent: var(--amber); --alert: var(--amber); --muted: color-mix(in srgb, var(--fg) 82%, transparent); color-scheme: dark; }
+:root[data-tone='ink'] { --bg: var(--ink); --fg: #EBEBE6; --accent: var(--amber); --alert: var(--amber); color-scheme: dark; }
+@media (min-width: 1100px) {
+  :root.ascent { --tower-w: clamp(96px, 8vw, 136px); }
+}
 
 *, *::before, *::after { box-sizing: border-box; }
 * { margin: 0; padding: 0; }
@@ -46,10 +54,10 @@ body {
   font-size: clamp(16px, 0.3vw + 15px, 19px);
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
   transition: background-color 0.8s var(--ease), color 0.8s var(--ease);
   overflow-x: clip;
 }
-:lang(ar) body, body:lang(ar) { font-family: var(--arabic); line-height: 1.8; }
 a { color: inherit; text-decoration: none; }
 button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
 img, svg, canvas { display: block; max-width: 100%; }
@@ -71,11 +79,22 @@ ul, ol { list-style: none; }
   font-weight: 760;
   font-stretch: 125%;
   text-transform: uppercase;
-  line-height: 0.86;
+  line-height: 0.88;
   letter-spacing: -0.015em;
 }
-:lang(ar) .display { font-family: var(--arabic); text-transform: none; font-weight: 700; line-height: 1.15; letter-spacing: 0; }
 .display .line { display: block; }
+/* Masked line reveals: let the clip box breathe so accents and descenders are never cut. */
+.sl-mask { padding-block: 0.08em; margin-block: -0.08em; }
+
+/* ---------- Arabic ----------
+   Arabic letters join, so no tracking, no capitals and no monospace: every label falls back to
+   Readex Pro at a size that reads. Display lines get the height Arabic ascenders and dots need. */
+:lang(ar) body, body:lang(ar) { font-family: var(--arabic); line-height: 1.85; }
+:lang(ar) :not(.ltr) { letter-spacing: 0 !important; }
+:lang(ar) .display { font-family: var(--arabic); text-transform: none; font-weight: 700; line-height: 1.24; font-stretch: normal; }
+:lang(ar) .sl-mask { padding-block: 0.2em; margin-block: -0.2em; }
+:lang(ar) .mono:not(.ltr) { font-family: var(--arabic); font-size: 0.8rem; line-height: 1.6; text-transform: none; font-stretch: normal; font-weight: 450; }
+:lang(ar) .act { font-family: var(--arabic); font-size: 0.9rem; text-transform: none; font-stretch: normal; font-weight: 500; }
 
 /* Rolling text link: the label slides up and a copy rolls in from below. */
 .roll { position: relative; display: inline-flex; overflow: hidden; vertical-align: bottom; }
@@ -83,6 +102,7 @@ ul, ol { list-style: none; }
 .roll > span + span { position: absolute; inset: 0; transform: translateY(105%); }
 a:hover .roll > span:first-child, button:hover .roll > span:first-child, a:focus-visible .roll > span:first-child { transform: translateY(-105%); }
 a:hover .roll > span + span, button:hover .roll > span + span, a:focus-visible .roll > span + span { transform: none; }
+:lang(ar) .roll { padding-block: 0.15em; margin-block: -0.15em; }
 
 /* Underlined text link */
 .ul { background: linear-gradient(currentColor, currentColor) no-repeat 0 100% / 100% 1px; padding-bottom: 2px; transition: background-size 0.5s var(--ease); }
@@ -102,9 +122,39 @@ a:hover .roll > span + span, button:hover .roll > span + span, a:focus-visible .
 .act:hover::before, .act:focus-visible::before { transform: scaleY(1); }
 .act .arr { display: inline-block; transition: transform 0.45s var(--ease); }
 .act:hover .arr { transform: translateY(-3px); }
+.act.solid { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.act.solid::before { background: var(--accent); }
+.act.solid:hover, .act.solid:focus-visible { color: var(--bg); border-color: var(--accent); }
 
 /* Keyframe diamond */
 .key { display: inline-block; width: 0.55em; height: 0.55em; background: var(--amber); transform: rotate(45deg); flex: none; }
+
+/* Panels: the small live interfaces inside the chapters. Hairlines, no boxes, no shadows. */
+.panel { border-top: 1px solid var(--rule-strong); }
+.panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; color: var(--muted); border-bottom: 1px solid var(--rule); }
+.pulse { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex: none; animation: pulse 2.2s var(--ease) infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--amber) 70%, transparent); } 70%, 100% { box-shadow: 0 0 0 9px transparent; } }
+
+/* Transcripts: scripted conversations in the front-desk chapter and the live demos. */
+.transcript { display: grid; align-content: start; }
+.transcript[lang='ar'] { font-family: var(--arabic); }
+.transcript[lang='en'], .transcript[lang='fr'] { font-family: var(--text); }
+.transcript .line { display: grid; grid-template-columns: 8.5rem 1fr; gap: var(--gap); padding: 12px 0; border-bottom: 1px solid var(--rule); }
+.transcript .who { display: flex; flex-direction: column; gap: 2px; color: var(--muted); }
+.transcript .agent .role { color: var(--accent); }
+.transcript .rules-tag { color: var(--fg); }
+.transcript p { font-size: 1.02em; line-height: 1.5; }
+.transcript[lang='ar'] p { line-height: 1.75; }
+.transcript .user p { font-weight: 500; }
+.transcript .typing { display: inline-flex; gap: 4px; padding-top: 8px; }
+.transcript .typing i { width: 5px; height: 5px; background: currentColor; animation: blink 1s infinite; }
+.transcript .typing i:nth-child(2) { animation-delay: 0.15s; }
+.transcript .typing i:nth-child(3) { animation-delay: 0.3s; }
+@keyframes blink { 50% { opacity: 0.2; } }
+@media (max-width: 560px) {
+  .transcript .line { grid-template-columns: 1fr; gap: 4px; }
+  .transcript .who { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+}
 
 /* Hairline rows */
 .rows > li, .row { border-top: 1px solid var(--rule); }
@@ -118,14 +168,18 @@ a:hover .roll > span + span, button:hover .roll > span + span, a:focus-visible .
 .cursor-dot { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; background: #fff; border-radius: 50%; transition: transform 0.35s var(--ease); }
 .cursor-ring { position: absolute; width: 38px; height: 38px; margin: -19px 0 0 -19px; border: 1px solid #fff; border-radius: 50%; transition: transform 0.45s var(--ease), opacity 0.3s; }
 .cursor-label { position: absolute; top: 14px; left: 16px; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
+:lang(ar) .cursor-label { font-family: var(--arabic); font-size: 12px; text-transform: none; }
 .cursor.is-hover .cursor-ring { transform: scale(1.9); }
 .cursor.is-hover .cursor-dot { transform: scale(0); }
 .cursor.has-label .cursor-label { opacity: 1; transform: none; }
 .cursor.is-down .cursor-ring { transform: scale(0.7); }
+/* The cursor sits above open dialogs too. */
+dialog[open] ~ .cursor, .cursor { z-index: 2147483000; }
 
 /* Sections carry their own colour when no script is switching the page tone. */
-html:not(.ascent):not(.toned) [data-tone='cobalt'] { --fg: #F3F3EE; --bg: var(--cobalt); --accent: var(--amber); background: var(--bg); color: var(--fg); }
-html:not(.ascent):not(.toned) [data-tone='ink'] { --fg: #EBEBE6; --bg: var(--ink); --accent: var(--amber); background: var(--bg); color: var(--fg); }
+/* Derived colours are recomputed here: they were resolved against the root foreground. */
+html:not(.ascent):not(.toned) [data-tone='cobalt'] { --fg: #F3F3EE; --bg: var(--cobalt); --accent: var(--amber); --alert: var(--amber); --muted: color-mix(in srgb, var(--fg) 82%, transparent); --rule: color-mix(in srgb, var(--fg) 18%, transparent); --rule-strong: color-mix(in srgb, var(--fg) 42%, transparent); --panel: color-mix(in srgb, var(--fg) 4%, var(--bg)); background: var(--bg); color: var(--fg); }
+html:not(.ascent):not(.toned) [data-tone='ink'] { --fg: #EBEBE6; --bg: var(--ink); --accent: var(--amber); --alert: var(--amber); --muted: color-mix(in srgb, var(--fg) 66%, transparent); --rule: color-mix(in srgb, var(--fg) 18%, transparent); --rule-strong: color-mix(in srgb, var(--fg) 42%, transparent); --panel: color-mix(in srgb, var(--fg) 4%, var(--bg)); background: var(--bg); color: var(--fg); }
 html:not(.ascent):not(.toned) [data-tone='paper'] { background: var(--paper); }
 
 /* Smooth scrolling (Lenis) */
@@ -133,12 +187,16 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-stopped { overflow: hidden; }
 
-/* The ascent: the world is pinned to the bottom of the screen and stacks upwards. */
+/* The ascent: the world is a fixed, screen-sized box whose chapters stack upwards from its bottom
+   edge and overflow above it. The box itself never moves or resizes, so content changing height
+   off screen cannot shift what is on screen. */
 .ascent [data-world] {
-  position: fixed; left: 0; right: 0; bottom: 0;
-  display: flex; flex-direction: column-reverse;
+  position: fixed; inset: 0;
+  display: flex; flex-direction: column-reverse; justify-content: flex-start;
   will-change: transform;
 }
+/* Hold the first paint until the fonts are in, so nothing reflows in view (preloader covers it). */
+.ascent:not(.fonts-ready) [data-world] { visibility: hidden; animation: show-anyway 0s 2.5s forwards; }
 .ascent [data-world] > * { flex: none; }
 .ascent-spacer { pointer-events: none; }
 

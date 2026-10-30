@@ -2,7 +2,11 @@
 import Base from '../layouts/Base.astro';
 import Chapter from './Chapter.astro';
 import AgentChat from './AgentChat.astro';
+import IntakeBoard from './IntakeBoard.astro';
+import DailyBrief from './DailyBrief.astro';
+import InventoryPanel from './InventoryPanel.astro';
 import WorkIndex from './WorkIndex.astro';
+import TowerFallback from './TowerFallback.astro';
 import Roll from './Roll.astro';
 import { site, whatsappLink, emailLink } from '../config/site';
 import { personSchema, serviceSchema, faqSchema } from '../lib/schema';
@@ -13,42 +17,56 @@ const { lang } = Astro.props;
 const d = t(lang);
 const name = lang === 'ar' ? site.nameAr : site.name;
 const pad = (n: number) => String(n).padStart(2, '0');
+const phone = site.whatsapp.replace(/^\+(\d{3})(\d{3})(\d{3})(\d+)$/, '+$1 $2 $3 $4');
+const wa = whatsappLink(d.contact.waMessage);
+const caseHref = localePath(lang, '/work/multilingual-ai-intake/');
 ---
 
 <Base lang={lang} title={d.meta.title} description={d.meta.description} route="/" ascent jsonLd={[personSchema(lang), serviceSchema(lang), faqSchema(lang)]}>
   <canvas slot="backdrop" class="scene" data-scene aria-hidden="true"></canvas>
 
-  <!-- 00 · Start -->
-  <section class="ch ch-start" id="start" data-ch="0" data-tone="paper" aria-labelledby="start-h" data-cursor-zone={d.ui.clickHint}>
-    <div class="anchor a0" data-anchor="0" aria-hidden="true"></div>
-    <div class="start-top grid">
-      <p class="start-story" data-fade>{d.hero.story}</p>
+  <!-- 00 · Ground floor -->
+  <section class="ch-start" id="start" data-ch="0" data-tone="paper" aria-labelledby="start-h" data-cursor-zone={d.ui.clickHint}>
+    <div class="start-grid grid">
+      <div class="start-copy">
+        <p class="mono start-kicker">{d.hero.kicker}</p>
+        <h1 id="start-h" class="start-title display" data-title>{d.hero.title.map((l) => <span class="line">{l}</span>)}</h1>
+        <p class="start-sub" data-fade>{d.hero.sub}</p>
+        <div class="start-actions" data-fade>
+          <a class="act solid" href={wa} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}><Roll text={d.hero.primary} /><span class="arr" aria-hidden="true">↑</span></a>
+          <a class="ul" href="#work" data-goto="work" data-cursor-text={d.ui.cursorOpen}>{d.hero.secondary}</a>
+        </div>
+      </div>
+      <figure class="start-tower">
+        <div class="tower-slot" data-tower-slot="hero"><TowerFallback /></div>
+        <figcaption class="mono tower-cap">{d.hero.towerCaption}</figcaption>
+      </figure>
     </div>
-    <div class="start-cue">
+    <div class="start-foot grid">
       <p class="motto display">{d.hero.motto}</p>
-      <p class="mono cue-line" aria-hidden="true"><span class="cue-arrow">↑</span><span>{d.ui.cue}</span><span class="cue-hint">{d.ui.clickHint}</span></p>
-    </div>
-    <h1 id="start-h" class="start-title display" data-title>
-      {d.hero.title.map((l) => <span class="line">{l}</span>)}
-    </h1>
-    <div class="start-actions grid">
-      <a class="act" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}>
-        <Roll text={d.hero.primary} /><span class="arr" aria-hidden="true">↑</span>
-      </a>
-      <a class="ul" href="#work" data-goto="work" data-cursor-text={d.ui.cursorOpen}>{d.hero.secondary}</a>
-      <p class="start-id mono">{name} · {d.meta.role}</p>
+      <p class="mono cue" aria-hidden="true"><span class="cue-arrow">↑</span><span>{d.hero.cue}</span></p>
     </div>
   </section>
 
-  <!-- 01 · Understand -->
-  <Chapter lang={lang} id="understand" index={1} tone="paper" node={d.understand.node} service={d.understand.service}>
-    <div class="title-row grid"><h2 id="understand-h" class="ch-title display" data-title>{d.understand.title.map((l) => <span class="line">{l}</span>)}</h2><div class="anchor" data-anchor="1" aria-hidden="true"></div></div>
-    <div class="u-grid grid">
-      <div class="u-text">
-        <p class="lead" data-fade>{d.understand.body}</p>
+  <!-- 01 · Front desk -->
+  <Chapter lang={lang} id="frontdesk" index={1} tone="cobalt" kicker={d.frontdesk.kicker}>
+    <div class="fd-top grid">
+      <h2 id="frontdesk-h" class="ch-title display" data-title>{d.frontdesk.title.map((l) => <span class="line">{l}</span>)}</h2>
+      <div class="fd-num" data-fit-box>
+        <p class="big-num display ltr" data-stretch aria-hidden="true">{d.frontdesk.number}</p>
+        <p class="mono fd-cap">{d.frontdesk.numberCaption}</p>
+      </div>
+    </div>
+    <div class="split grid">
+      <div class="split-text">
+        <p class="lead" data-fade>{d.frontdesk.body}</p>
+        <ul class="points rows">{d.frontdesk.points.map((p, i) => <li><span class="mono ltr">{pad(i + 1)}</span><span>{p}</span></li>)}</ul>
+      </div>
+      <div class="split-visual">
+        <AgentChat lang={lang} />
         <div class="rules-wrap">
           <p class="mono label">{d.demo.rulesTitle}</p>
-          <ol class="rules rows" data-rules>
+          <ol class="rules" data-rules>
             {
               d.demo.rules.map((r, i) => (
                 <li data-rule={i}>
@@ -61,37 +79,56 @@ const pad = (n: number) => String(n).padStart(2, '0');
           </ol>
         </div>
       </div>
-      <div class="u-chat"><AgentChat lang={lang} /></div>
     </div>
   </Chapter>
 
-  <!-- 02 · Route -->
-  <Chapter lang={lang} id="route" index={2} tone="cobalt" node={d.route.node} service={d.route.service}>
-    <h2 id="route-h" class="ch-title display" data-title>{d.route.title.map((l) => <span class="line">{l}</span>)}</h2>
-    <div class="r-grid grid">
-      <div class="r-text">
-        <p class="lead" data-fade>{d.route.body}</p>
-        <ul class="rows points">
-          {d.route.points.map((p, i) => <li><span class="mono ltr">{String.fromCharCode(97 + i)}</span>{p}</li>)}
-        </ul>
+  <!-- 02 · Intake -->
+  <Chapter lang={lang} id="intake" index={2} tone="paper" kicker={d.intake.kicker}>
+    <div class="grid"><h2 id="intake-h" class="ch-title display span-title" data-title>{d.intake.title.map((l) => <span class="line">{l}</span>)}</h2></div>
+    <div class="split grid">
+      <div class="split-text">
+        <p class="lead" data-fade>{d.intake.body}</p>
+        <ul class="points rows">{d.intake.points.map((p, i) => <li><span class="mono ltr">{pad(i + 1)}</span><span>{p}</span></li>)}</ul>
+        <p class="proof"><span class="key" aria-hidden="true"></span><span>{d.intake.proof} <a class="ul" href={caseHref} data-cursor-text={d.ui.cursorOpen}>{d.intake.proofLink}</a></span></p>
       </div>
-      <div class="r-big">
-        <p class="r-num display ltr" data-stretch>{d.route.number}</p>
-        <p class="mono r-cap">{d.route.numberCaption}</p>
-        <div class="anchor a2" data-anchor="2" aria-hidden="true"><div class="r-tiles" data-tiles>{Array.from({ length: 42 }, () => <i />)}</div></div>
-      </div>
+      <div class="split-visual"><IntakeBoard lang={lang} /></div>
     </div>
   </Chapter>
 
-  <!-- 03 · Report -->
-  <Chapter lang={lang} id="report" index={3} tone="ink" node={d.report.node} service={d.report.service}>
-    <h2 id="report-h" class="ch-title display" data-title>{d.report.title.map((l) => <span class="line">{l}</span>)}</h2>
-    <div class="rep-grid grid">
-      <p class="lead" data-fade>{d.report.body}</p>
-      <div class="anchor a3" data-anchor="3" aria-hidden="true"></div>
-      <ol class="rep-rows rows">
+  <!-- 03 · Assistant -->
+  <Chapter lang={lang} id="assistant" index={3} tone="ink" kicker={d.assistant.kicker}>
+    <div class="grid"><h2 id="assistant-h" class="ch-title display span-title" data-title>{d.assistant.title.map((l) => <span class="line">{l}</span>)}</h2></div>
+    <div class="split grid">
+      <div class="split-text">
+        <p class="lead" data-fade>{d.assistant.body}</p>
+        <ul class="points rows">{d.assistant.points.map((p, i) => <li><span class="mono ltr">{pad(i + 1)}</span><span>{p}</span></li>)}</ul>
+      </div>
+      <div class="split-visual"><DailyBrief lang={lang} /></div>
+    </div>
+  </Chapter>
+
+  <!-- 04 · Back office -->
+  <Chapter lang={lang} id="backoffice" index={4} tone="paper" kicker={d.backoffice.kicker}>
+    <div class="grid"><h2 id="backoffice-h" class="ch-title display span-title" data-title>{d.backoffice.title.map((l) => <span class="line">{l}</span>)}</h2></div>
+    <div class="split grid">
+      <div class="split-text">
+        <p class="lead" data-fade>{d.backoffice.body}</p>
+        <ul class="points rows">{d.backoffice.points.map((p, i) => <li><span class="mono ltr">{pad(i + 1)}</span><span>{p}</span></li>)}</ul>
+      </div>
+      <div class="split-visual"><InventoryPanel lang={lang} /></div>
+    </div>
+  </Chapter>
+
+  <!-- 05 · Reports -->
+  <Chapter lang={lang} id="reports" index={5} tone="cobalt" kicker={d.reports.kicker}>
+    <div class="grid rep-top">
+      <h2 id="reports-h" class="ch-title display span-title" data-title>{d.reports.title.map((l) => <span class="line">{l}</span>)}</h2>
+      <p class="lead rep-lead" data-fade>{d.reports.body}</p>
+    </div>
+    <div class="grid">
+      <ol class="rep-rows">
         {
-          d.report.rows.map((r, i) => (
+          d.reports.rows.map((r, i) => (
             <li>
               <span class="rk display">{r.k}</span>
               <span class="rv">{r.v}</span>
@@ -103,18 +140,17 @@ const pad = (n: number) => String(n).padStart(2, '0');
     </div>
   </Chapter>
 
-  <!-- 04 · Interface -->
-  <Chapter lang={lang} id="interface" index={4} tone="paper" node={d.interface.node} service={d.interface.service}>
-    <h2 id="interface-h" class="ch-title display" data-title>{d.interface.title.map((l) => <span class="line">{l}</span>)}</h2>
-    <div class="grid">
-      <p class="lead i-lead" data-fade>{d.interface.body}</p>
-      <div class="anchor a4" data-anchor="4" aria-hidden="true"></div>
+  <!-- 06 · Apps -->
+  <Chapter lang={lang} id="apps" index={6} tone="paper" kicker={d.apps.kicker}>
+    <div class="grid rep-top">
+      <h2 id="apps-h" class="ch-title display span-title" data-title>{d.apps.title.map((l) => <span class="line">{l}</span>)}</h2>
+      <p class="lead rep-lead" data-fade>{d.apps.body}</p>
     </div>
     <div class="i-process">
-      <p class="mono label pad">{d.interface.processTitle}</p>
+      <p class="mono label pad">{d.apps.processTitle}</p>
       <ol class="steps grid" data-steps>
         {
-          d.interface.steps.map((s, i) => (
+          d.apps.steps.map((s, i) => (
             <li>
               <span class="mono ltr">{pad(i + 1)}</span>
               <span class="st display">{s.title}</span>
@@ -126,12 +162,12 @@ const pad = (n: number) => String(n).padStart(2, '0');
       </ol>
     </div>
     <div class="i-offers">
-      <p class="mono label pad">{d.interface.offersTitle}</p>
+      <p class="mono label pad">{d.apps.offersTitle}</p>
       <ol class="offers">
         {
-          d.interface.offers.map((o, i) => (
+          d.apps.offers.map((o, i) => (
             <li>
-              <a class="offer grid" href={whatsappLink(d.interface.offerMessage + o.name)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}>
+              <a class="offer grid" href={whatsappLink(d.apps.offerMessage + o.name)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}>
                 <span class="mono ltr">{pad(i + 1)}</span>
                 <span class="on display">{o.name}</span>
                 <span class="mono ot">{o.time}</span>
@@ -142,27 +178,27 @@ const pad = (n: number) => String(n).padStart(2, '0');
           ))
         }
       </ol>
-      <p class="mono note pad">{d.interface.offersNote}</p>
+      <p class="mono note pad">{d.apps.offersNote}</p>
     </div>
   </Chapter>
 
-  <!-- 05 · Work -->
-  <Chapter lang={lang} id="work" index={5} tone="ink" node={d.work.node} service={d.work.service}>
-    <h2 id="work-h" class="ch-title display" data-title>{d.work.title.map((l) => <span class="line">{l}</span>)}</h2>
-    <div class="grid"><p class="lead w-lead" data-fade>{d.work.body}</p></div>
+  <!-- 07 · Work -->
+  <Chapter lang={lang} id="work" index={7} tone="ink" kicker={d.work.kicker}>
+    <div class="grid rep-top">
+      <h2 id="work-h" class="ch-title display span-title" data-title>{d.work.title.map((l) => <span class="line">{l}</span>)}</h2>
+      <p class="lead rep-lead" data-fade>{d.work.body}</p>
+    </div>
     <WorkIndex lang={lang} />
   </Chapter>
 
-  <!-- 06 · Human -->
-  <Chapter lang={lang} id="human" index={6} tone="paper" node={d.human.node}>
-    <div class="title-row grid"><h2 id="human-h" class="ch-title display" data-title>{d.human.title.map((l) => <span class="line">{l}</span>)}</h2><div class="anchor" data-anchor="5" aria-hidden="true"></div></div>
-    <div class="grid">
-      <p class="h-story" data-lit>{d.human.story}</p>
-    </div>
+  <!-- 08 · About -->
+  <Chapter lang={lang} id="about" index={8} tone="paper" kicker={d.about.kicker}>
+    <div class="grid"><h2 id="about-h" class="ch-title display span-title" data-title>{d.about.title.map((l) => <span class="line">{l}</span>)}</h2></div>
+    <div class="grid"><p class="h-story" data-lit>{d.about.story}</p></div>
     <div class="h-grid grid">
-      <dl class="h-facts rows">
+      <dl class="h-facts">
         {
-          d.human.facts.map((f) => (
+          d.about.facts.map((f) => (
             <div>
               <dt class="mono">{f.k}</dt>
               <dd>{f.v}</dd>
@@ -171,24 +207,57 @@ const pad = (n: number) => String(n).padStart(2, '0');
         }
       </dl>
       <div class="h-links">
-        <a class="act" href={site.orpetron} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorOpen}><Roll text={d.human.orpetron} /><span class="arr" aria-hidden="true">↗</span></a>
-        <a class="act" href={site.iconscout} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorOpen}><Roll text={d.human.iconscout} /><span class="arr" aria-hidden="true">↗</span></a>
+        <a class="act" href={site.orpetron} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorOpen}><Roll text={d.about.orpetron} /><span class="arr" aria-hidden="true">↗</span></a>
+        <a class="act" href={site.iconscout} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorOpen}><Roll text={d.about.iconscout} /><span class="arr" aria-hidden="true">↗</span></a>
       </div>
     </div>
   </Chapter>
 
-  <!-- 07 · Output -->
-  <Chapter lang={lang} id="output" index={7} tone="cobalt" node={d.output.node} class="ch-output">
+  <!-- 09 · Contact: the top floor. The CTA first, then the questions. -->
+  <Chapter lang={lang} id="contact" index={9} tone="cobalt" kicker={d.contact.kicker} class="ch-contact">
+    <div class="contact grid">
+      <div class="contact-main">
+        <h2 id="contact-h" class="ch-title display contact-title" data-title>{d.contact.title.map((l) => <span class="line">{l}</span>)}</h2>
+        <p class="lead" data-fade>{d.contact.body}</p>
+        <p class="mono avail"><span class="key" aria-hidden="true"></span> {d.contact.availability}</p>
+        <a class="act solid contact-cta" href={wa} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorSend}><Roll text={d.contact.circle} /><span class="arr" aria-hidden="true">↑</span></a>
+        <ul class="contact-links">
+          <li>
+            <span class="mono">{d.contact.whatsapp}</span>
+            <a class="ul ltr" id="c-phone" href={wa} target="_blank" rel="noopener">{phone}</a>
+            <button type="button" class="mono cp" data-copy={site.whatsapp} data-copied={d.ui.copied} aria-describedby="c-phone" data-cursor-text={d.ui.cursorCopy}>{d.ui.copy}</button>
+          </li>
+          <li>
+            <span class="mono">{d.contact.email}</span>
+            <a class="ul ltr" id="c-mail" href={emailLink(d.contact.emailSubject)}>{site.email}</a>
+            <button type="button" class="mono cp" data-copy={site.email} data-copied={d.ui.copied} aria-describedby="c-mail" data-cursor-text={d.ui.cursorCopy}>{d.ui.copy}</button>
+          </li>
+          <li>
+            <span class="mono">{d.contact.linkedin}</span>
+            <a class="ul ltr" href={site.linkedin} target="_blank" rel="noopener">linkedin.com/in/omarsarsar</a>
+            <span></span>
+          </li>
+        </ul>
+      </div>
+      <div class="contact-tower" data-tower-slot="end" aria-hidden="true"></div>
+    </div>
+
+    <div class="marquee" aria-hidden="true" data-marquee>
+      <div class="marquee-track display" data-marquee-track>
+        {Array.from({ length: 4 }, () => <span>{d.contact.marquee} <i class="key" /></span>)}
+      </div>
+    </div>
+
     <div class="faq">
-      <h3 class="mono label pad">{d.output.faqTitle}</h3>
+      <h3 class="mono label pad">{d.contact.faqTitle}</h3>
       <div class="faq-list">
         {
-          d.output.faq.map((f, i) => (
+          d.contact.faq.map((f, i) => (
             <details name="faq">
               <summary class="grid">
                 <span class="mono ltr">{pad(i + 1)}</span>
                 <span class="fq">{f.q}</span>
-                <span class="fx mono" aria-hidden="true" />
+                <span class="fx" aria-hidden="true" />
               </summary>
               <div class="grid"><p class="fa">{f.a}</p></div>
             </details>
@@ -196,56 +265,19 @@ const pad = (n: number) => String(n).padStart(2, '0');
         }
       </div>
     </div>
-
-    <div class="contact grid">
-      <h2 id="output-h" class="ch-title display contact-title" data-title>{d.output.title.map((l) => <span class="line">{l}</span>)}</h2>
-      <div class="contact-text">
-        <p class="lead" data-fade>{d.output.body}</p>
-        <p class="mono avail"><span class="key"></span> {d.output.availability}</p>
-        <ul class="contact-links rows">
-          <li>
-            <span class="mono">{d.output.whatsapp}</span>
-            <a class="ul ltr" id="c-phone" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener">{site.whatsapp}</a>
-            <button type="button" class="mono cp" data-copy={site.whatsapp} data-copied={d.ui.copied} aria-describedby="c-phone" data-cursor-text={d.ui.cursorCopy}>{d.ui.copy}</button>
-          </li>
-          <li>
-            <span class="mono">{d.output.email}</span>
-            <a class="ul ltr" id="c-mail" href={emailLink(d.output.emailSubject)}>{site.email}</a>
-            <button type="button" class="mono cp" data-copy={site.email} data-copied={d.ui.copied} aria-describedby="c-mail" data-cursor-text={d.ui.cursorCopy}>{d.ui.copy}</button>
-          </li>
-          {
-            site.linkedin && (
-              <li>
-                <span class="mono">{d.output.linkedin}</span>
-                <a class="ul ltr" href={site.linkedin} target="_blank" rel="noopener">linkedin.com/in/omarsarsar</a>
-                <span />
-              </li>
-            )
-          }
-        </ul>
-      </div>
-      <a class="circle" href={whatsappLink(d.output.waMessage)} target="_blank" rel="noopener" data-magnetic data-anchor="6" data-cursor-text={d.ui.cursorSend}>
-        <span class="circle-in"><Roll text={d.output.circle} /><span aria-hidden="true">↑</span></span>
-      </a>
-    </div>
-
-    <div class="marquee" aria-hidden="true" data-marquee>
-      <div class="marquee-track display" data-marquee-track>
-        {Array.from({ length: 4 }, () => <span>{d.output.marquee} <i class="key" /></span>)}
-      </div>
-    </div>
-
-    <footer class="outro">
-      <div class="outro-meta grid mono">
-        <span>{d.ui.localTime} · UTC+3 · <span class="ltr" data-clock>--:--</span></span>
-        <a href="#start" class="ul" data-goto="start">{d.ui.backToStart} ↓</a>
-        <a class="ul" href={site.linkedin} target="_blank" rel="noopener">LinkedIn ↗</a>
-        <a class="ul" href={localePath(otherLang(lang), '/')} hreflang={otherLang(lang)} lang={otherLang(lang)}>{d.ui.switchTo}</a>
-        <span>© {new Date().getFullYear()} {name}. {d.ui.rights}</span>
-      </div>
-      <p class="outro-name display" aria-hidden="true" data-fit>{name}</p>
-    </footer>
   </Chapter>
+
+  <!-- The roof: the name on top of the building, and the footer. -->
+  <footer class="roof" data-tone="cobalt">
+    <p class="roof-name display" aria-hidden="true" data-fit>{name}</p>
+    <div class="roof-meta grid mono">
+      <span>{d.ui.localTime} · <span class="ltr">UTC+3 · <span data-clock>--:--</span></span></span>
+      <a href="#start" class="ul" data-goto="start">{d.ui.backToStart} ↓</a>
+      <a class="ul" href={site.linkedin} target="_blank" rel="noopener">{d.contact.linkedin} ↗</a>
+      <a class="ul" href={localePath(otherLang(lang), '/')} hreflang={otherLang(lang)} lang={otherLang(lang)}>{otherLang(lang) === 'ar' ? 'العربية' : 'English'}</a>
+      <span>© {new Date().getFullYear()} {name}. {d.ui.rights}</span>
+    </div>
+  </footer>
 
   <script>
     import '../scripts/ascent';
@@ -260,162 +292,170 @@ const pad = (n: number) => String(n).padStart(2, '0');
 
   .pad { padding-inline: var(--pad); }
   .label { color: var(--muted); margin-bottom: 12px; }
-  .lead { font-size: clamp(1.05rem, 0.6vw + 0.9rem, 1.45rem); line-height: 1.42; max-width: 34ch; }
-  .ch-title { font-size: clamp(2.8rem, 7.2vw, 9rem); padding-inline: var(--pad); }
-  .title-row { align-items: stretch; }
-  .title-row .ch-title { grid-column: 1 / span 8; padding-inline: 0; }
-  .title-row .anchor { grid-column: 9 / span 4; min-height: 12rem; }
-  :lang(ar) .ch-title { font-size: clamp(2.4rem, 6.6vw, 7.5rem); }
+  .lead { font-size: clamp(1.05rem, 0.55vw + 0.9rem, 1.4rem); line-height: 1.45; max-width: 36ch; }
+  :lang(ar) .lead { line-height: 1.8; max-width: 40ch; }
+  .ch-title { font-size: clamp(2.6rem, 6.2vw, 7.4rem); }
+  :lang(ar) .ch-title { font-size: clamp(2.2rem, 5.2vw, 6rem); }
+  .span-title { grid-column: 1 / span 9; }
 
-  /* 00 · Start */
+  /* Split: text beside a live interface */
+  .split { align-items: start; row-gap: 40px; }
+  .split-text { grid-column: 1 / span 5; display: grid; gap: 28px; align-content: start; }
+  .split-visual { grid-column: 7 / span 6; display: grid; gap: 28px; }
+  .points li { display: grid; grid-template-columns: 2.4rem 1fr; gap: 10px; padding: 12px 0; align-items: baseline; }
+  .points .mono { color: var(--accent); }
+  .proof { display: flex; gap: 12px; align-items: baseline; font-size: 0.95rem; color: var(--muted); max-width: 44ch; }
+  .proof .key { transform: rotate(45deg) translateY(-1px); }
+  .proof a { color: var(--fg); white-space: nowrap; }
+
+  /* 00 · Ground floor */
   .ch-start {
-    position: relative; min-height: 100svh; display: grid;
-    grid-template-rows: auto 1fr auto auto;
-    padding: calc(64px + env(safe-area-inset-top, 0px)) 0 calc(var(--dock) + 28px);
-    gap: clamp(16px, 3vh, 32px);
+    position: relative; min-height: 100svh; display: grid; grid-template-rows: 1fr auto;
+    padding: calc(70px + env(safe-area-inset-top, 0px)) 0 calc(var(--dock) + 26px);
+    row-gap: clamp(20px, 4vh, 40px);
   }
-  .start-top { align-items: start; }
-  .anchor { pointer-events: none; }
-  .a0 { position: absolute; inset-inline-end: var(--pad); top: 30%; width: 46%; height: 22%; }
-  .start-story { grid-column: 9 / span 4; font-size: clamp(1rem, 0.5vw + 0.85rem, 1.25rem); line-height: 1.45; }
-  .start-cue { align-self: center; justify-self: start; margin-inline-start: var(--pad); display: grid; gap: 14px; max-width: 30rem; }
-  .motto { font-size: clamp(1.3rem, 2.1vw, 2.2rem); line-height: 0.98; font-stretch: 112%; font-weight: 700; }
-  .cue-line { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; color: var(--muted); }
-  .cue-hint { color: var(--muted); }
-  .cue-arrow { font-size: 1.4rem; animation: rise 1.8s var(--ease) infinite; }
+  .start-grid { align-items: center; row-gap: 28px; }
+  .start-copy { grid-column: 1 / span 7; display: grid; gap: clamp(18px, 3vh, 30px); justify-items: start; }
+  .start-kicker { color: var(--muted); }
+  .start-title { font-size: clamp(3rem, 6.5vw, 8.6rem); }
+  :lang(ar) .start-title { font-size: clamp(2.8rem, 6vw, 7.4rem); }
+  .start-sub { font-size: clamp(1.02rem, 0.5vw + 0.9rem, 1.3rem); line-height: 1.5; max-width: 44ch; }
+  :lang(ar) .start-sub { line-height: 1.85; }
+  .start-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 28px; }
+  .start-tower { grid-column: 8 / span 5; display: grid; gap: 12px; justify-items: center; align-self: stretch; }
+  .tower-slot { width: 100%; height: min(66vh, 680px); display: grid; place-items: center; }
+  .tower-cap { color: var(--muted); text-align: center; max-width: 30ch; }
+  .start-foot { align-items: end; row-gap: 12px; border-top: 1px solid var(--rule); padding-top: 18px; margin-inline: var(--pad); padding-inline: 0; }
+  .motto { grid-column: 1 / span 7; font-size: clamp(1.15rem, 1.8vw, 1.9rem); line-height: 1.05; font-stretch: 112%; font-weight: 700; }
+  :lang(ar) .motto { font-size: clamp(1.2rem, 1.9vw, 1.9rem); line-height: 1.5; }
+  .cue { grid-column: 8 / span 5; justify-self: end; display: flex; align-items: center; gap: 10px; color: var(--muted); }
+  .cue-arrow { font-size: 1.3rem; animation: rise 1.8s var(--ease) infinite; }
   @keyframes rise { 0% { transform: translateY(10px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(-14px); opacity: 0; } }
-  .start-title { font-size: clamp(3rem, 7.4vw, 10.5rem); padding-inline: var(--pad); }
-  :global(.calm) .start-cue, :global(html:not(.ascent)) .start-cue { visibility: hidden; }
-  :lang(ar) .start-title { font-size: clamp(3rem, 9vw, 10rem); }
-  .start-actions { align-items: center; row-gap: 14px; }
-  .start-actions .act { grid-column: 1 / span 3; justify-self: start; }
-  .start-actions .ul { grid-column: 4 / span 3; justify-self: start; font-size: 0.95rem; }
-  .start-id { grid-column: 8 / span 5; justify-self: end; color: var(--muted); text-align: end; }
+  :global(.calm) .cue, :global(html:not(.ascent)) .cue { visibility: hidden; }
 
-  /* 01 · Understand */
-  .u-grid { align-items: start; row-gap: 40px; }
-  .u-text { grid-column: 1 / span 5; display: grid; gap: 40px; }
-  .u-chat { grid-column: 7 / span 6; }
-  .rules > li { display: grid; grid-template-columns: 2.4rem 1fr; column-gap: 12px; padding: 12px 0; color: var(--muted); transition: color 0.4s; }
-  .rules .rt { font-weight: 600; color: inherit; }
-  .rules .rb { grid-column: 2; font-size: 0.9rem; }
+  /* 01 · Front desk */
+  .fd-top { align-items: end; row-gap: 24px; }
+  .fd-top .ch-title { grid-column: 1 / span 7; }
+  .fd-num { grid-column: 8 / span 5; display: grid; justify-items: end; text-align: end; gap: 10px; min-width: 0; }
+  .big-num { font-size: clamp(6rem, 15vw, 16rem); line-height: 0.8; font-weight: 900; font-stretch: 62%; white-space: nowrap; font-family: var(--display); }
+  .fd-cap { color: var(--muted); max-width: 30ch; padding-top: 0.9em; }
+  .rules-wrap { display: grid; }
+  .rules { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--gap); border-top: 1px solid var(--rule); }
+  .rules > li { display: grid; grid-template-columns: 2.2rem 1fr; column-gap: 10px; padding: 12px 0; border-bottom: 1px solid var(--rule); color: var(--muted); transition: color 0.4s; }
+  .rules .rt { font-weight: 600; color: inherit; line-height: 1.35; }
+  .rules .rb { grid-column: 2; font-size: 0.88rem; }
   .rules > li.is-on { color: var(--fg); }
   .rules > li.is-on .mono { color: var(--accent); }
 
-  /* 02 · Route */
-  .r-grid { align-items: end; row-gap: 40px; }
-  .r-text { grid-column: 1 / span 5; display: grid; gap: 28px; justify-items: start; }
-  .points { width: 100%; }
-  .points li { display: flex; gap: 16px; padding: 12px 0; }
-  .r-big { grid-column: 7 / span 6; display: grid; justify-items: end; text-align: end; }
-  .r-num { font-size: clamp(10rem, 30vw, 34rem); line-height: 0.78; font-weight: 900; font-stretch: 50%; }
-  .r-cap { max-width: 22ch; color: var(--muted); }
-  .a2 { width: min(100%, 26rem); margin-top: 18px; aspect-ratio: 1.2; display: flex; align-items: flex-end; justify-content: flex-end; }
-  :global(.scene-on) .r-tiles { visibility: hidden; }
-  .r-tiles { display: grid; grid-template-columns: repeat(15, 12px); gap: 5px; margin-top: 18px; }
-  .r-tiles i { width: 12px; height: 12px; border: 1px solid var(--rule-strong); transition: background-color 0.3s; }
-  .r-tiles i.on { background: var(--accent); border-color: var(--accent); }
-
-  /* 03 · Report */
-  .rep-grid { row-gap: 40px; align-items: end; }
-  .rep-grid .lead { grid-column: 1 / span 5; }
-  .a3 { grid-column: 7 / span 6; align-self: stretch; min-height: 16rem; }
-  .rep-rows { grid-column: 1 / -1; }
-  .rep-rows li { display: grid; grid-template-columns: 1.3fr 2fr 2fr; gap: var(--gap); align-items: center; padding: 18px 0; }
-  .rk { font-size: clamp(1.6rem, 3.4vw, 3.4rem); line-height: 1; }
+  /* 05 · Reports, and the shared title + lead row */
+  .rep-top { row-gap: 24px; align-items: end; }
+  .rep-top .span-title { grid-column: 1 / span 10; }
+  .rep-lead { grid-column: 7 / span 6; }
+  .rep-rows { grid-column: 1 / -1; border-top: 1px solid var(--rule-strong); }
+  .rep-rows li { display: grid; grid-template-columns: 1.2fr 2fr 2fr; gap: var(--gap); align-items: center; padding: 20px 0; border-bottom: 1px solid var(--rule); }
+  .rk { font-size: clamp(1.6rem, 3.2vw, 3.2rem); line-height: 1; }
+  :lang(ar) .rk { line-height: 1.3; }
   .rv { color: var(--muted); }
   .rbar { height: 1px; background: var(--rule); position: relative; }
-  .rbar i { position: absolute; inset-block: -3px; inset-inline-start: 0; width: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
-  [dir='rtl'] .rbar i { transform-origin: right; }
+  .rbar i { position: absolute; inset-block: -3px; inset-inline-start: 0; width: 100%; background: var(--accent); transform: scaleX(1); transform-origin: left; }
+  :global([dir='rtl']) .rbar i { transform-origin: right; }
+  :global(.ascent-live) .rbar i { transform: scaleX(0); }
 
-  /* 04 · Interface */
-  .i-lead { grid-column: 1 / span 6; }
-  .a4 { grid-column: 7 / span 6; min-height: 15rem; }
+  /* 06 · Apps */
+  .i-process, .i-offers { display: grid; }
   .steps { row-gap: 28px; }
   .steps li { grid-column: span 3; display: grid; gap: 8px; align-content: start; padding-top: 14px; border-top: 1px solid var(--rule); position: relative; }
-  .steps li::before { content: ''; position: absolute; top: -1px; inset-inline-start: 0; width: 100%; height: 1px; background: var(--fg); transform: scaleX(var(--fill, 0)); transform-origin: left; }
-  [dir='rtl'] .steps li::before { transform-origin: right; }
+  .steps li::before { content: ''; position: absolute; top: -1px; inset-inline-start: 0; width: 100%; height: 1px; background: var(--fg); transform: scaleX(var(--fill, 1)); transform-origin: left; }
+  :global(.ascent-live) .steps li::before { transform: scaleX(var(--fill, 0)); }
+  :global([dir='rtl']) .steps li::before { transform-origin: right; }
   .st { font-size: clamp(1.4rem, 2.2vw, 2.2rem); line-height: 1; }
+  :lang(ar) .st { line-height: 1.35; }
   .sm { color: var(--accent); }
   .sb { color: var(--muted); font-size: 0.95rem; }
-  .offers { border-top: 1px solid var(--rule); }
+  .offers { border-top: 1px solid var(--rule-strong); }
   .offer { position: relative; isolation: isolate; align-items: baseline; padding-block: 22px; border-bottom: 1px solid var(--rule); transition: color 0.45s var(--ease); }
   .offer::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--fg); transform: scaleY(0); transform-origin: 50% 100%; transition: transform 0.6s var(--ease); }
   .offer:hover, .offer:focus-visible { color: var(--bg); }
   .offer:hover::before, .offer:focus-visible::before { transform: scaleY(1); }
+  .offer:focus-visible { outline-offset: -2px; }
   .offer > .mono:first-child { grid-column: 1; }
-  .on { grid-column: 2 / span 4; font-size: clamp(1.5rem, 2.6vw, 2.8rem); line-height: 1; }
+  .on { grid-column: 2 / span 4; font-size: clamp(1.4rem, 2.4vw, 2.6rem); line-height: 1; }
+  :lang(ar) .on { line-height: 1.35; }
   .ot { grid-column: 6 / span 2; }
   .ob { grid-column: 8 / span 4; font-size: 0.95rem; }
   .oa { grid-column: 12; justify-self: end; font-size: 1.4rem; transition: transform 0.5s var(--ease); }
   .offer:hover .oa { transform: translate(4px, -4px); }
-  [dir='rtl'] .offer:hover .oa { transform: translate(-4px, -4px) scaleX(-1); }
-  [dir='rtl'] .oa { transform: scaleX(-1); }
+  :global([dir='rtl']) .oa { transform: scaleX(-1); }
+  :global([dir='rtl']) .offer:hover .oa { transform: translate(-4px, -4px) scaleX(-1); }
   .note { color: var(--muted); margin-top: 16px; }
 
-  /* 05 · Human */
-  .h-story { grid-column: 1 / span 10; font-size: clamp(1.4rem, 2.6vw, 2.9rem); line-height: 1.18; font-weight: 500; letter-spacing: -0.01em; }
-  .h-story :global(.w) { opacity: 0.18; transition: opacity 0.3s; }
+  /* 08 · About */
+  .h-story { grid-column: 1 / span 10; font-size: clamp(1.35rem, 2.4vw, 2.7rem); line-height: 1.22; font-weight: 500; letter-spacing: -0.01em; }
+  :lang(ar) .h-story { font-size: clamp(1.25rem, 2.1vw, 2.3rem); line-height: 1.7; font-weight: 450; }
+  .h-story :global(.w) { opacity: 0.2; transition: opacity 0.3s; }
   .h-story :global(.w.lit) { opacity: 1; }
   .h-grid { align-items: start; row-gap: 32px; }
-  .h-facts { grid-column: 1 / span 6; }
-  .h-facts div { display: grid; grid-template-columns: 1fr 1.6fr; gap: var(--gap); padding: 12px 0; border-top: 1px solid var(--rule); }
-  .h-facts div:last-child { border-bottom: 1px solid var(--rule); }
+  .h-facts { grid-column: 1 / span 6; border-bottom: 1px solid var(--rule); }
+  .h-facts div { display: grid; grid-template-columns: 1fr 1.6fr; gap: var(--gap); padding: 12px 0; border-top: 1px solid var(--rule); align-items: baseline; }
   .h-facts dt { color: var(--muted); }
   .h-links { grid-column: 8 / span 5; display: flex; flex-wrap: wrap; gap: 12px; align-content: start; }
 
-  /* 06 · Output */
-  .faq-list { border-top: 1px solid var(--rule); }
+  /* 09 · Contact */
+  .contact { align-items: start; row-gap: 36px; }
+  .contact-main { grid-column: 1 / span 7; display: grid; gap: 26px; justify-items: start; align-content: start; }
+  .contact-tower { grid-column: 8 / span 5; height: min(62vh, 600px); }
+  .avail { display: flex; align-items: center; gap: 10px; }
+  .contact-cta { font-size: 0.8rem; padding: 1.1em 1.5em; }
+  .contact-links { width: 100%; border-bottom: 1px solid var(--rule); }
+  .contact-links li { display: grid; grid-template-columns: 6.5rem 1fr auto; gap: var(--gap); align-items: baseline; padding: 12px 0; border-top: 1px solid var(--rule); }
+  .contact-links .mono { color: var(--muted); }
+  .contact-links a { justify-self: start; overflow-wrap: anywhere; }
+  .cp { color: var(--muted); padding: 6px 0; }
+  .cp:hover { color: var(--fg); }
+  .marquee { overflow: hidden; border-block: 1px solid var(--rule); padding-block: 2vh; }
+  .marquee-track { display: flex; width: max-content; font-size: clamp(3rem, 9vw, 11rem); line-height: 1.05; will-change: transform; }
+  :lang(ar) .marquee-track { line-height: 1.4; }
+  .marquee-track span { display: flex; align-items: center; gap: 0.3em; padding-inline-end: 0.3em; white-space: nowrap; }
+  .marquee-track .key { width: 0.26em; height: 0.26em; }
+  .faq-list { border-top: 1px solid var(--rule-strong); }
   .faq details { border-bottom: 1px solid var(--rule); }
   .faq summary { list-style: none; cursor: pointer; align-items: baseline; padding-block: 18px; }
   .faq summary::-webkit-details-marker { display: none; }
   .faq summary > .mono:first-child { grid-column: 1; }
-  .fq { grid-column: 2 / span 9; font-size: clamp(1.1rem, 1.6vw, 1.6rem); font-weight: 600; line-height: 1.2; }
-  .fx { grid-column: 12; justify-self: end; }
-  .fx::before { content: '+'; font-size: 1.1rem; }
-  details[open] .fx::before { content: '−'; }
-  .fa { grid-column: 2 / span 7; padding-bottom: 22px; color: var(--muted); max-width: 60ch; }
-  .contact { row-gap: 36px; align-items: end; }
-  .contact-title { grid-column: 1 / -1; padding-inline: 0; }
-  .contact-text { grid-column: 1 / span 6; display: grid; gap: 24px; }
-  .avail { display: flex; align-items: center; gap: 10px; }
-  .contact-links li { display: grid; grid-template-columns: 6rem 1fr auto; gap: var(--gap); align-items: baseline; padding: 12px 0; }
-  .contact-links .mono { color: var(--muted); }
-  .cp { color: var(--muted); }
-  .cp:hover { color: var(--fg); }
-  .circle {
-    grid-column: 9 / span 4; justify-self: center; align-self: center;
-    width: clamp(160px, 17vw, 260px); aspect-ratio: 1; border-radius: 50%;
-    background: var(--fg); color: var(--bg); display: grid; place-items: center;
-    transition: transform 0.5s var(--ease);
-  }
-  .circle-in { display: flex; gap: 10px; align-items: center; font-family: var(--mono); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; font-stretch: 87.5%; }
-  .circle:hover { transform: scale(1.06); }
-  .marquee { overflow: hidden; border-block: 1px solid var(--rule); padding-block: 2vh; }
-  .marquee-track { display: flex; width: max-content; font-size: clamp(3rem, 10vw, 12rem); line-height: 1; will-change: transform; }
-  .marquee-track span { display: flex; align-items: center; gap: 0.3em; padding-inline-end: 0.3em; white-space: nowrap; }
-  .marquee-track .key { width: 0.28em; height: 0.28em; }
-  .outro { display: grid; gap: 2vh; padding-top: 72px; }
-  .outro-meta { color: var(--muted); row-gap: 10px; }
-  .outro-meta > :nth-child(1) { grid-column: 1 / span 3; }
-  .outro-meta > :nth-child(2) { grid-column: 4 / span 4; justify-self: start; }
-  .outro-meta > :nth-child(3) { grid-column: 8 / span 1; }
-  .outro-meta > :nth-child(4) { grid-column: 9 / span 1; }
-  .outro-meta > :nth-child(5) { grid-column: 10 / span 3; justify-self: end; }
-  .w-lead { grid-column: 1 / span 6; }
-  .outro-name { display: inline-block; font-size: 10vw; line-height: 0.82; font-weight: 900; font-stretch: 150%; white-space: nowrap; margin-inline: var(--pad); }
-  :lang(ar) .outro-name { font-size: 15vw; line-height: 1.1; }
+  .fq { grid-column: 2 / span 9; font-size: clamp(1.1rem, 1.5vw, 1.5rem); font-weight: 600; line-height: 1.3; }
+  .fx { grid-column: 12; justify-self: end; width: 14px; height: 14px; position: relative; }
+  .fx::before, .fx::after { content: ''; position: absolute; inset: 6px 0 auto; height: 2px; background: currentColor; transition: transform 0.4s var(--ease); }
+  .fx::after { transform: rotate(90deg); }
+  details[open] .fx::after { transform: rotate(0deg); }
+  .fa { grid-column: 2 / span 7; padding-bottom: 22px; color: var(--muted); max-width: 62ch; }
 
+  /* The roof */
+  .roof { display: grid; gap: 2vh; padding: 10vh 0 4vh; background: var(--bg); overflow-x: clip; }
+  /* In page order (reduced motion) the roof is last: keep it clear of the dock. */
+  :global(html:not(.ascent)) .roof { padding-bottom: calc(var(--dock) + 6vh); }
+  .roof-name { display: inline-block; font-size: 10vw; line-height: 0.82; font-weight: 900; font-stretch: 150%; white-space: nowrap; margin-inline: var(--pad); }
+  :lang(ar) .roof-name { line-height: 1.25; }
+  .roof-meta { color: var(--muted); row-gap: 10px; border-top: 1px solid var(--rule); padding-top: 16px; margin-inline: var(--pad); padding-inline: 0; }
+  .roof-meta > :nth-child(1) { grid-column: 1 / span 3; }
+  .roof-meta > :nth-child(2) { grid-column: 4 / span 3; justify-self: start; }
+  .roof-meta > :nth-child(3) { grid-column: 7 / span 2; }
+  .roof-meta > :nth-child(4) { grid-column: 9 / span 1; }
+  .roof-meta > :nth-child(5) { grid-column: 10 / span 3; justify-self: end; }
+
+  @media (max-width: 1100px) {
+    .split-text { grid-column: 1 / span 6; }
+    .split-visual { grid-column: 7 / span 6; }
+    .rules { grid-template-columns: 1fr; }
+  }
   @media (max-width: 900px) {
-    .start-id { grid-column: 1 / -1; justify-self: start; text-align: start; }
-    .a0 { top: 23%; width: 92%; height: 8%; }
-    .title-row .ch-title { grid-column: 1 / -1; }
-    .title-row .anchor, .a3, .a4 { grid-column: 1 / -1; min-height: 11rem; }
-    .start-story { grid-column: 1 / -1; grid-row: 2; margin-top: 12px; }
-    .start-actions .act { grid-column: 1 / span 7; }
-    .start-actions .ul { grid-column: 8 / span 5; justify-self: end; }
-    .u-text, .u-chat, .r-text, .r-big, .rep-grid .lead, .i-lead, .h-story, .h-facts, .h-links, .contact-text { grid-column: 1 / -1; }
-    .r-big { justify-items: start; text-align: start; }
+    .start-copy, .start-tower, .motto, .cue { grid-column: 1 / -1; }
+    .start-tower { grid-row: 1; }
+    .tower-slot { height: 40svh; }
+    .tower-cap { display: none; }
+    .cue { justify-self: start; }
+    .span-title, .fd-top .ch-title, .fd-num, .rep-top .span-title, .rep-lead, .split-text, .split-visual, .h-story, .h-facts, .h-links, .contact-main { grid-column: 1 / -1; }
+    .fd-num { justify-items: start; text-align: start; }
+    .contact-tower { grid-column: 1 / -1; height: 40svh; grid-row: 1; }
     .steps li { grid-column: span 6; }
     .rep-rows li { grid-template-columns: 1fr 1.6fr; }
     .rbar { grid-column: 1 / -1; }
@@ -425,10 +465,15 @@ const pad = (n: number) => String(n).padStart(2, '0');
     .oa { grid-column: 12; grid-row: 1; }
     .fq { grid-column: 2 / span 10; }
     .fa { grid-column: 2 / span 11; }
-    .circle { grid-column: 1 / -1; justify-self: start; }
-    .outro-meta > * { grid-column: 1 / -1 !important; justify-self: start !important; }
+    .roof-meta > * { grid-column: 1 / -1 !important; justify-self: start !important; }
   }
   @media (max-width: 560px) {
+    .ch-title { font-size: clamp(1.9rem, 9vw, 2.6rem); font-stretch: 112%; }
+    :lang(ar) .ch-title { font-size: clamp(2rem, 9.4vw, 2.8rem); }
+    .start-title { font-size: clamp(2.3rem, 11vw, 3.2rem); font-stretch: 112%; }
+    :lang(ar) .start-title { font-size: clamp(2.4rem, 11.4vw, 3.3rem); }
     .steps li { grid-column: 1 / -1; }
+    .contact-links li { grid-template-columns: 1fr auto; }
+    .contact-links li > .mono:first-child { grid-column: 1 / -1; }
   }
 </style>

@@ -8,6 +8,7 @@ import anybodyLatin from '@fontsource-variable/anybody/files/anybody-latin-wdth-
 import readexArabic from '@fontsource-variable/readex-pro/files/readex-pro-arabic-hexp-normal.woff2?url';
 import readexLatin from '@fontsource-variable/readex-pro/files/readex-pro-latin-hexp-normal.woff2?url';
 import martianLatin from '@fontsource-variable/martian-mono/files/martian-mono-latin-wdth-normal.woff2?url';
+import schibstedLatin from '@fontsource-variable/schibsted-grotesk/files/schibsted-grotesk-latin-wght-normal.woff2?url';
 import Preloader from '../components/Preloader.astro';
 import Cursor from '../components/Cursor.astro';
 import Hud from '../components/Hud.astro';
@@ -77,7 +78,7 @@ const ogImage = abs(`/og/${lang}.png`);
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/site.webmanifest" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    {(lang === 'ar' ? [readexArabic, readexLatin, martianLatin] : [anybodyLatin, martianLatin]).map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
+    {(lang === 'ar' ? [readexArabic, readexLatin, martianLatin] : [anybodyLatin, schibstedLatin, martianLatin]).map((href) => <link rel="preload" href={href} as="font" type="font/woff2" crossorigin />)}
 
     <script is:inline set:html={BOOT} />
     {jsonLd.map((item) => <script type="application/ld+json" set:html={JSON.stringify(item)} />)}

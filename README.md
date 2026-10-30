@@ -2,7 +2,7 @@
 
 Bilingual (English / العربية) portfolio for Omar Sarsar, AI Automation & Product Builder.
 
-**Concept: The Ascent.** The home page opens at the bottom and scrolling down climbs up. The story follows a single request through the system: received, understood, routed, reported, shown, then the work, the person behind it, and finally everything running on autopilot. "With Omar, you don't go down. You go up." The navigation lives in a dock at the bottom of the screen.
+**Concept: The Ascent.** The home page opens at the bottom and scrolling down climbs up: a business rising floor by floor, each floor one job handed to an AI teammate (front desk, intake, assistant, back office, reports, apps), then the work, the person behind it and the way in. A Three.js tower builds the same floors as you climb. "With Omar, you don't go down. You go up." The navigation lives in a dock at the bottom of the screen.
 
 - **Stack:** [Astro](https://astro.build) 7, TypeScript (strict), GSAP (ScrollTrigger, SplitText), Lenis smooth scroll, Three.js (lazy-loaded), plain CSS with design tokens.
 - **Type:** Anybody (variable width, animated with the scroll), Schibsted Grotesk, Martian Mono, Readex Pro for Arabic. All self-hosted.
@@ -12,7 +12,9 @@ Bilingual (English / العربية) portfolio for Omar Sarsar, AI Automation & 
 
 ### How the ascent works
 
-`src/scripts/ascent.ts` pins the page content to the bottom of the screen with its chapters stacked upwards (`column-reverse`). A spacer gives the document its height, so native scrolling, the scrollbar and the keyboard all keep working, and each frame the content is translated by the scroll position. Lenis smooths the wheel and GSAP's ticker drives the frame. `src/scripts/scene.ts` pins each 3D object to an empty `data-anchor` box in the layout, so it travels with the page and never covers body text.
+`src/scripts/ascent.ts` puts the page content in a fixed, screen-sized box whose chapters stack upwards from its bottom edge (`column-reverse`) and overflow above it, so content changing height off screen never shifts what is on screen. A spacer gives the document its height, so native scrolling, the scrollbar and the keyboard all keep working, and each frame the content is translated by the scroll position. Lenis smooths the wheel and GSAP's ticker drives the frame. Each chapter's progress drives its live interface (transcript, intake board, morning brief, inventory, report bars).
+
+`src/scripts/tower.ts` draws the tower with an orthographic camera in screen pixels. It sits in the hero slot (`data-tower-slot="hero"`), docks into a slim column at the inline end while you climb (`mini`, wide screens only; chapters reserve `--tower-w` for it) and returns at full size beside the contact chapter (`end`). It never covers body text.
 
 ## Edit the content
 
@@ -21,14 +23,14 @@ Bilingual (English / العربية) portfolio for Omar Sarsar, AI Automation & 
 | Email, WhatsApp, LinkedIn, IconScout links | `src/config/site.ts` |
 | English text | `src/i18n/en.ts` |
 | Arabic text | `src/i18n/ar.ts` (must have the same shape as English; the build fails if a field is missing) |
-| Demo conversations and the message slips in 3D | `src/i18n/demo-scripts.ts` |
+| Demo conversations (front desk, case study, the six live demos with their results) and the message slips in 3D | `src/i18n/demo-scripts.ts` |
 | Colours, type, buttons, grid | `src/styles/global.css` |
 | Home chapters | `src/components/HomePage.astro` |
-| Project index (client work, agency work, concept builds) | `work.projects` in `src/i18n/en.ts` and `ar.ts`; drawings in `src/components/WorkPreview.astro` |
+| Project index (client work, agency work, live demos) | `work.projects` in `src/i18n/en.ts` and `ar.ts`; drawings in `src/components/WorkPreview.astro`; the demo dialog in `src/components/DemoDialog.astro` |
 | Case study | `src/components/CaseStudyPage.astro` |
 | Social preview images | `public/og/en.png`, `public/og/ar.png` |
 
-Concept builds are labelled as such on the site. When one becomes real client work, change its `kind` and `link` in the project list.
+Live demos run on sample data and are labelled as such on the site. When one becomes real client work, change its `kind`, `type` and `link` in the project list.
 
 ## Run locally
 

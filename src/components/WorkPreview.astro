@@ -96,4 +96,58 @@ const bars = [34, 52, 28, 64, 44, 72, 58];
       </>
     )
   }
+  {
+    kind === 'assistant' && (
+      <>
+        <rect x="24" y="24" width="150" height="152" />
+        <path d="M24 46 H174" stroke-width="1" />
+        <circle cx="38" cy="35" r="4" fill={amber} stroke="none" />
+        {[0, 1, 2, 3].map((i) => <path d={`M38 ${68 + i * 26} H${150 - i * 16}`} stroke-width="1" />)}
+        {[0, 1, 2, 3].map((i) => <rect x="30" y={64 + i * 26} width="4" height="8" fill={cobalt} stroke="none" />)}
+        {Array.from({ length: 21 }, (_, i) => <rect x={196 + (i % 7) * 15} y={56 + Math.floor(i / 7) * 15} width="11" height="11" fill={i === 9 ? amber : i === 3 ? cobalt : 'none'} stroke={i === 9 || i === 3 ? 'none' : 'currentColor'} stroke-width="1" />)}
+        <circle cx="248" cy="140" r="26" />
+        <path d="M248 124 V140 L260 148" stroke-width="2" />
+      </>
+    )
+  }
+  {
+    kind === 'forms' && (
+      <>
+        <rect x="24" y="30" width="110" height="140" />
+        {[0, 1, 2, 3].map((i) => <><path d={`M36 ${54 + i * 28} H96`} stroke-width="1" /><rect x="36" y={60 + i * 28} width="86" height="10" stroke-width="1" /></>)}
+        <path d="M134 100 H176" />
+        <path d="M168 92 L178 100 L168 108" />
+        <rect x="190" y="40" width="104" height="30" />
+        <rect x="190" y="85" width="104" height="30" fill={cobalt} stroke="none" />
+        <rect x="190" y="130" width="104" height="30" />
+        <path d="M202 100 l6 6 l12 -14" stroke="#F3F3EE" stroke-width="2" />
+        <rect x="270" y="48" width="14" height="14" transform="rotate(45 277 55)" fill={amber} stroke="none" />
+      </>
+    )
+  }
+  {
+    kind === 'inventory' && (
+      <>
+        <path d="M20 176 H300" stroke-width="1" />
+        <rect x="32" y="112" width="64" height="64" />
+        <rect x="40" y="62" width="50" height="50" />
+        <rect x="108" y="96" width="70" height="80" fill={cobalt} stroke="none" />
+        <rect x="190" y="140" width="40" height="36" fill={amber} stroke="none" />
+        {[0, 1, 2].map((i) => <><path d={`M246 ${44 + i * 34} H296`} stroke-width="1" /><rect x="246" y={50 + i * 34} width={i === 1 ? 14 : 44} height="8" fill={i === 1 ? amber : 'currentColor'} stroke="none" /></>)}
+        <path d="M268 40 V150" stroke={cobalt} stroke-width="1.5" stroke-dasharray="3 4" />
+      </>
+    )
+  }
+  {
+    kind === 'site' && (
+      <>
+        <path d="M160 18 L214 40 L160 62 L106 40 Z" fill={amber} stroke="none" />
+        {[0, 1, 2, 3, 4].map((i) => <path d={`M106 ${54 + i * 24} L160 ${76 + i * 24} L214 ${54 + i * 24}`} stroke-width={i === 0 ? 1.5 : 1} />)}
+        <path d="M106 40 V172 M214 40 V172 M160 62 V194" stroke-width="1" />
+        <path d="M106 172 L160 194 L214 172" />
+        <path d="M40 150 C 70 150, 74 110, 96 110" stroke={cobalt} stroke-width="3" />
+        <path d="M280 60 V30 M272 38 L280 30 L288 38" stroke-width="2" />
+      </>
+    )
+  }
 </svg>

@@ -1,8 +1,9 @@
 ---
 // Project index: hairline rows; a drawing follows the cursor on hover (inline thumbnails on touch).
-// A filled diamond marks shipped work, a hollow one marks a concept build.
+// Live demos open a dialog where the system runs on sample data; real work links out.
 import WorkPreview from './WorkPreview.astro';
-import { site, whatsappLink } from '../config/site';
+import DemoDialog from './DemoDialog.astro';
+import { site } from '../config/site';
 import { t, localePath, type Lang } from '../i18n';
 
 interface Props { lang: Lang }
@@ -10,11 +11,7 @@ const { lang } = Astro.props;
 const d = t(lang);
 const w = d.work;
 const pad = (n: number) => String(n).padStart(2, '0');
-const hrefFor = (link: string, name: string) =>
-  link === 'case' ? localePath(lang, '/work/multilingual-ai-intake/')
-  : link === 'orpetron' ? site.orpetron
-  : link === 'iconscout' ? site.iconscout
-  : whatsappLink(w.conceptMessage + name);
+const external = (link: string) => (link === 'orpetron' ? site.orpetron : link === 'iconscout' ? site.iconscout : '');
 ---
 
 <div class="work" data-work>
@@ -27,57 +24,87 @@ const hrefFor = (link: string, name: string) =>
   </div>
   <ol class="w-list">
     {
-      w.projects.map((p, i) => (
-        <li>
-          <a
-            class="w-row grid"
-            href={hrefFor(p.link, p.name)}
-            target={p.link === 'case' ? undefined : '_blank'}
-            rel={p.link === 'case' ? undefined : 'noopener'}
-            data-cursor-text={p.link === 'concept' ? d.ui.cursorSend : d.ui.cursorOpen}
-          >
+      w.projects.map((p, i) => {
+        const inner = (
+          <>
             <span class="mono ltr w-i">{pad(i + 1)}</span>
             <span class="w-name">
               <span class="display">{p.name}</span>
               <span class="mono w-tags">{p.tags}</span>
             </span>
-            <span class:list={['mono', 'w-kind', p.link === 'concept' && 'is-concept']}>{p.kind}</span>
+            <span class={`mono w-kind k-${p.type}`}>{p.kind}</span>
             <span class="w-sector">{p.sector}</span>
-            <span class="mono w-year">{p.year}</span>
-            <span class="w-arr" aria-hidden="true">↗</span>
+            <span class="mono w-year" dir="auto">{p.year}</span>
+            <span class="w-go" aria-hidden="true">{p.link === 'demo' ? <span class="mono w-try">{w.tryDemo}</span> : null}<span class="w-arr">{p.link === 'demo' ? '↗' : p.link === 'top' ? '↓' : '↗'}</span></span>
             <span class="w-thumb" aria-hidden="true"><WorkPreview kind={p.preview} /></span>
-          </a>
-        </li>
-      ))
+          </>
+        );
+        return (
+          <li>
+            {p.link === 'demo' ? (
+              <button type="button" class="w-row grid" data-demo={p.demo} data-index={i} aria-haspopup="dialog" data-cursor-text={d.ui.cursorTry}>{inner}</button>
+            ) : p.link === 'case' ? (
+              <a class="w-row grid" href={localePath(lang, '/work/multilingual-ai-intake/')} data-cursor-text={d.ui.cursorOpen}>{inner}</a>
+            ) : p.link === 'top' ? (
+              <a class="w-row grid" href="#start" data-goto="start" data-cursor-text={d.ui.cursorOpen}>{inner}</a>
+            ) : (
+              <a class="w-row grid" href={external(p.link)} target="_blank" rel="noopener" data-cursor-text={d.ui.cursorOpen}>{inner}</a>
+            )}
+          </li>
+        );
+      })
     }
   </ol>
-  <p class="mono w-note"><span class="dia" aria-hidden="true"></span> {w.legendShipped} <span class="dia hollow" aria-hidden="true"></span> {w.legendConcept} · {w.note}</p>
+  <p class="mono w-note"><span class="w-live" aria-hidden="true"></span>{w.note}</p>
   <div class="w-preview" data-wpreview aria-hidden="true"></div>
+  <DemoDialog lang={lang} />
 </div>
 
 <script>
   import { gsap } from 'gsap';
   import { calm } from '../scripts/state';
+  import '../scripts/demo';
 
   const root = document.querySelector<HTMLElement>('[data-work]');
   const preview = root?.querySelector<HTMLElement>('[data-wpreview]');
   if (root && preview && !calm() && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
     // The world is transformed, so the follower lives on <body> to stay fixed to the viewport.
     document.body.append(preview);
+    const rtl = document.documentElement.dir === 'rtl';
+    const off = (x: number) => (rtl ? x - 324 : x + 24);
     const qx = gsap.quickTo(preview, 'x', { duration: 0.5, ease: 'power3' });
     const qy = gsap.quickTo(preview, 'y', { duration: 0.5, ease: 'power3' });
+    // Show the drawing only when the pointer really moves over a row: rows also slide under a
+    // resting cursor while the page scrolls, and that should not pop a preview up.
+    let lx = -1;
+    let ly = -1;
+    let shownFor: HTMLElement | null = null;
     root.querySelectorAll<HTMLElement>('.w-row').forEach((row) => {
-      row.addEventListener('pointerenter', (e) => {
-        preview.innerHTML = row.querySelector('.w-thumb')?.innerHTML ?? '';
-        gsap.set(preview, { x: e.clientX + 24, y: e.clientY - 110 });
-        gsap.to(preview, { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'expo.out' });
-      });
       row.addEventListener('pointermove', (e) => {
-        qx(e.clientX + 24);
+        const moved = e.clientX !== lx || e.clientY !== ly;
+        lx = e.clientX;
+        ly = e.clientY;
+        if (!moved) return;
+        if (shownFor !== row) {
+          shownFor = row;
+          preview.innerHTML = row.querySelector('.w-thumb')?.innerHTML ?? '';
+          gsap.set(preview, { x: off(e.clientX), y: e.clientY - 110 });
+          gsap.to(preview, { autoAlpha: 1, scale: 1, duration: 0.45, ease: 'expo.out' });
+        }
+        qx(off(e.clientX));
         qy(e.clientY - 110);
       });
-      row.addEventListener('pointerleave', () => gsap.to(preview, { autoAlpha: 0, scale: 0.92, duration: 0.3 }));
+      row.addEventListener('pointerleave', () => {
+        shownFor = null;
+        gsap.to(preview, { autoAlpha: 0, scale: 0.92, duration: 0.3 });
+      });
+      row.addEventListener('click', () => gsap.to(preview, { autoAlpha: 0, duration: 0.2 }));
     });
+    window.addEventListener('wheel', () => {
+      if (!shownFor) return;
+      shownFor = null;
+      gsap.to(preview, { autoAlpha: 0, scale: 0.92, duration: 0.3 });
+    }, { passive: true });
   }
 </script>
 
@@ -89,27 +116,33 @@ const hrefFor = (link: string, name: string) =>
   .h-sector { grid-column: 9 / span 2; }
   .h-year { grid-column: 11; }
   .w-list { border-top: 1px solid var(--rule-strong); }
-  .w-row { position: relative; isolation: isolate; align-items: baseline; padding-block: 20px; border-bottom: 1px solid var(--rule); transition: color 0.45s var(--ease); }
+  .w-row { position: relative; isolation: isolate; width: 100%; text-align: start; align-items: baseline; padding-block: 20px; border-bottom: 1px solid var(--rule); transition: color 0.45s var(--ease); }
   .w-row::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--fg); transform: scaleY(0); transform-origin: 50% 100%; transition: transform 0.6s var(--ease); }
   .w-row:hover, .w-row:focus-visible { color: var(--bg); }
   .w-row:hover::before, .w-row:focus-visible::before { transform: scaleY(1); }
+  .w-row:focus-visible { outline-offset: -2px; }
   .w-i { grid-column: 1; color: inherit; opacity: 0.7; }
-  .w-name { grid-column: 2 / span 5; display: grid; gap: 6px; }
-  .w-name .display { font-size: clamp(1.4rem, 2.5vw, 2.6rem); line-height: 0.95; }
+  .w-name { grid-column: 2 / span 5; display: grid; gap: 8px; }
+  .w-name .display { font-size: clamp(1.35rem, 2.3vw, 2.5rem); line-height: 0.98; }
+  :lang(ar) .w-name .display { font-size: clamp(1.3rem, 2.1vw, 2.2rem); line-height: 1.35; }
   .w-tags { opacity: 0.7; }
   .w-kind { grid-column: 7 / span 2; display: flex; align-items: center; gap: 8px; }
-  .w-kind::before { content: ''; width: 8px; height: 8px; background: var(--amber); transform: rotate(45deg); flex: none; }
-  .w-kind.is-concept::before { background: transparent; border: 1px solid currentColor; }
+  .w-kind::before { content: ''; width: 8px; height: 8px; flex: none; transform: rotate(45deg); border: 1px solid currentColor; }
+  .w-kind.k-client::before { background: var(--amber); border-color: var(--amber); }
+  .w-kind.k-demo::before { transform: none; border-radius: 50%; background: var(--amber); border-color: var(--amber); animation: pulse 2.2s var(--ease) infinite; }
   .w-sector { grid-column: 9 / span 2; font-size: 0.92rem; }
   .w-year { grid-column: 11; }
-  .w-arr { grid-column: 12; justify-self: end; font-size: 1.3rem; transition: transform 0.5s var(--ease); }
+  .w-go { grid-column: 12; justify-self: end; display: inline-flex; align-items: baseline; gap: 10px; }
+  .w-try { opacity: 0; transform: translateX(-6px); transition: opacity 0.4s var(--ease), transform 0.4s var(--ease); white-space: nowrap; }
+  :global([dir='rtl']) .w-try { transform: translateX(6px); }
+  .w-row:hover .w-try, .w-row:focus-visible .w-try { opacity: 1; transform: none; }
+  .w-arr { font-size: 1.3rem; transition: transform 0.5s var(--ease); display: inline-block; }
   .w-row:hover .w-arr { transform: translate(4px, -4px); }
-  [dir='rtl'] .w-arr { transform: scaleX(-1); }
-  [dir='rtl'] .w-row:hover .w-arr { transform: translate(-4px, -4px) scaleX(-1); }
+  :global([dir='rtl']) .w-arr { transform: scaleX(-1); }
+  :global([dir='rtl']) .w-row:hover .w-arr { transform: translate(-4px, -4px) scaleX(-1); }
   .w-thumb { display: none; }
-  .w-note { color: var(--muted); padding: 16px var(--pad) 0; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
-  .dia { width: 8px; height: 8px; background: var(--amber); transform: rotate(45deg); display: inline-block; }
-  .dia.hollow { background: transparent; border: 1px solid currentColor; }
+  .w-note { color: var(--muted); padding: 16px var(--pad) 0; display: flex; align-items: center; gap: 10px; }
+  .w-live { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex: none; }
   .w-preview {
     position: fixed; top: 0; left: 0; z-index: 80; pointer-events: none;
     width: 300px; aspect-ratio: 320 / 200; padding: 10px;
@@ -117,14 +150,17 @@ const hrefFor = (link: string, name: string) =>
     opacity: 0; visibility: hidden; transform: scale(0.92);
   }
   .w-preview :global(svg) { width: 100%; height: 100%; }
+  @media (max-width: 1180px) {
+    .w-try { display: none; }
+  }
   @media (max-width: 900px) {
     .w-head { display: none; }
-    .w-row { grid-template-columns: 2.2rem 1fr 5.5rem; row-gap: 8px; column-gap: 12px; }
+    .w-row { grid-template-columns: 2.2rem 1fr 6.5rem; row-gap: 8px; column-gap: 12px; }
     .w-i { grid-column: 1; grid-row: 1; }
     .w-name { grid-column: 2; grid-row: 1; }
     .w-kind { grid-column: 2; grid-row: 2; }
     .w-sector { grid-column: 2; grid-row: 3; }
-    .w-year, .w-arr { display: none; }
+    .w-year, .w-go { display: none; }
     .w-thumb { display: block; grid-column: 3; grid-row: 1 / span 3; align-self: start; background: #F4F4F0; color: #0D0D10; border: 1px solid var(--rule-strong); padding: 4px; }
     .w-thumb :global(svg) { width: 100%; height: auto; }
   }
