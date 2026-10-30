@@ -25,6 +25,7 @@ const chat: ChatPlayer | null = chatRoot ? setupChat(chatRoot, document.querySel
 if (isAscent()) startAscent();
 
 function startAscent() {
+  root.classList.add('ascent-live');
   const spacer = document.createElement('div');
   spacer.className = 'ascent-spacer';
   spacer.setAttribute('aria-hidden', 'true');

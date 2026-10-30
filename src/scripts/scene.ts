@@ -8,7 +8,7 @@ import { state } from './state';
 import { flowMessages } from '../i18n/demo-scripts';
 
 // Nominal height in world units of each chapter's object, used to fit it into its anchor.
-const NOMINAL = [3.9, 5.4, 4.6, 4.4, 3.6, 3.8, 6.2];
+const NOMINAL = [3.1, 5.4, 4.6, 4.4, 3.6, 3.8, 6.2];
 const FOV = 30;
 const CUBES = 42;
 const DIST = 16;

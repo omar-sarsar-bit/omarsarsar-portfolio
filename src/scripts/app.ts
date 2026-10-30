@@ -5,6 +5,7 @@ import { gsap } from 'gsap';
 import { calm } from './state';
 
 const root = document.documentElement;
+root.classList.add('app-live');
 const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
 
 function preloader(): Promise<void> {
@@ -41,7 +42,8 @@ function preloader(): Promise<void> {
       .add(() => {}, '+=0.15')
       // The curtain drops: on this site things move down as you rise.
       .to(el, { yPercent: 100, duration: 0.9, ease: 'expo.inOut' });
-    document.fonts?.ready.then(() => tl.play());
+    // Start once the fonts are in, but never wait more than a second for them.
+    Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise((r) => setTimeout(r, 1000))]).then(() => tl.play());
   });
 }
 
