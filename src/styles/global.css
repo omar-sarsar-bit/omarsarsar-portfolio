@@ -199,6 +199,9 @@ html.lenis, html.lenis body { height: auto; }
 .ascent:not(.fonts-ready) [data-world] { visibility: hidden; animation: show-anyway 0s 2.5s forwards; }
 .ascent [data-world] > * { flex: none; }
 .ascent-spacer { pointer-events: none; }
+/* Between floors the lift rides with the floors dimmed (--vis is set per floor by the engine),
+   so a floor is never read from its last line. The roof and the backdrop are not dimmed. */
+.ascent-live [data-ch] > * { opacity: var(--vis, 1); }
 
 /* Titles and fades stay hidden until the script has split them, so fonts swapping in cannot shift
    visible text. A delayed fallback shows them anyway if the script never runs. */

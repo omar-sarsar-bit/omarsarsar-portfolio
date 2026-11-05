@@ -14,8 +14,8 @@ export const state = {
   progress: 0,
   /** Continuous chapter position: 2.5 means halfway between chapters 2 and 3. */
   chapter: 0,
-  /** 0..1 progress inside each chapter while it crosses the viewport. */
-  chapterProgress: new Array(10).fill(0) as number[],
+  /** 0..1 how far each floor's live interface has played since the lift stopped there. */
+  chapterPlay: new Array(10).fill(0) as number[],
   pointer: { x: 0, y: 0 },
   tone: 'paper' as 'paper' | 'cobalt' | 'ink',
   rtl: false,

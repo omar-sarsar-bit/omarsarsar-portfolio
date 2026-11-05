@@ -1,5 +1,6 @@
 ---
-// The floor indicator in the top corner, and the slot the tower docks into while you climb.
+// The floor indicator in the top corner, the slot the tower docks into while you climb, and the
+// lift display that takes the screen while the page rides from one floor to the next.
 import { t, type Lang } from '../i18n';
 
 interface Props { lang: Lang }
@@ -17,6 +18,12 @@ const last = String(d.chapters.length - 1).padStart(2, '0');
   </p>
 </aside>
 <div class="tower-mini" data-tower-slot="mini" aria-hidden="true"></div>
+<!-- The lift display: shown while the page rides between floors, so nothing is read upside down. -->
+<div class="lift" data-lift aria-hidden="true">
+  <span class="lift-k mono"><span class="lift-arr">↑</span><span>{d.ui.floor}</span></span>
+  <span class="lift-n display ltr" data-lift-n>01</span>
+  <span class="lift-name" data-lift-name>{d.chapters[1]}</span>
+</div>
 
 <style>
   .hud {
@@ -38,4 +45,16 @@ const last = String(d.chapters.length - 1).padStart(2, '0');
     width: var(--tower-w);
   }
   @media (max-width: 1099px) { .tower-mini { display: none; } }
+  .lift {
+    position: fixed; inset: 0 var(--tower-w) var(--dock) 0; z-index: 70; pointer-events: none;
+    display: grid; place-content: center; justify-items: center; gap: 1.6vh; text-align: center;
+    color: var(--fg); opacity: 0;
+  }
+  :global(html:not(.ascent-live)) .lift { display: none; }
+  .lift-k { display: inline-flex; align-items: center; gap: 10px; color: var(--accent); }
+  .lift-arr { display: inline-block; font-size: 0.9rem; transition: transform 0.4s var(--ease); }
+  .lift[data-dir='down'] .lift-arr { transform: rotate(180deg); }
+  .lift-n { font-size: clamp(6rem, 19vw, 15rem); line-height: 0.8; font-weight: 900; font-stretch: 140%; font-variant-numeric: tabular-nums; }
+  .lift-name { font-weight: 600; font-size: clamp(1.05rem, 1.6vw, 1.5rem); }
+  :lang(ar) .lift-n { font-family: var(--display); font-weight: 900; font-stretch: 140%; line-height: 0.8; }
 </style>

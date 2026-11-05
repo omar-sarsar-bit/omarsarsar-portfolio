@@ -182,7 +182,7 @@ export async function startTower(canvas: HTMLCanvasElement): Promise<boolean> {
       c.add(sheet);
     });
     f(2).update = () => {
-      const lit = Math.round(clamp((state.chapterProgress[2] - 0.25) / 0.4) * cells.length);
+      const lit = Math.round(clamp((state.chapterPlay[2] - 0.05) / 0.6) * cells.length);
       cells.forEach((m, k) => m.scale.setScalar(Math.max(0.001, m.scale.x + ((k < lit ? 1 : 0) - m.scale.x) * 0.15)));
     };
   }
@@ -250,9 +250,9 @@ export async function startTower(canvas: HTMLCanvasElement): Promise<boolean> {
     sheet.position.set(0, 0.01, 0.6);
     c.add(sheet);
     f(5).update = () => {
-      const p = state.chapterProgress[5];
+      const p = state.chapterPlay[5];
       bars.forEach((b, k) => {
-        const target = b.userData.h * ease((p - 0.22 - k * 0.04) / 0.3);
+        const target = b.userData.h * ease((p - 0.05 - k * 0.05) / 0.4);
         b.scale.y = Math.max(0.001, b.scale.y + (target - b.scale.y) * 0.12);
       });
     };
@@ -311,7 +311,7 @@ export async function startTower(canvas: HTMLCanvasElement): Promise<boolean> {
     c.add(frame);
     const total = tubeGeo.index!.count;
     f(8).update = () => {
-      const p = ease((state.chapterProgress[8] - 0.2) / 0.4);
+      const p = ease(state.chapterPlay[8] / 0.8);
       tubeGeo.setDrawRange(0, Math.max(3, Math.floor((total * p) / 3) * 3));
     };
   }
